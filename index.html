@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=28">
+<link rel="stylesheet" href="style.css?v=29">
 </head>
 <body>
 
@@ -121,13 +121,13 @@
 
   <!-- INCOME -->
   <section id="income" hidden>
-    <div class="section-head section-head--split">
+    <div class="section-head section-head--split section-head--breakdown">
       <div class="section-head-text">
         <h2>Income</h2>
       </div>
 
       <!-- Kad jumlah income (kanan atas) -->
-      <article class="card card--income card--total" id="incomeTotal">
+      <article class="card card--income card--total card--breakdown" id="incomeTotal">
         <div class="card-label">
           <span class="card-icon">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="m6 13 6 6 6-6"/></svg>
@@ -135,6 +135,9 @@
           Jumlah Income
         </div>
         <p class="amount"><span class="cur">RM</span> <span id="incomeTotalValue">&mdash;</span></p>
+
+        <!-- Pecahan ikut kategori: amount & peratus -->
+        <ul class="breakdown" id="incomeBreakdown" aria-label="Pecahan income ikut kategori"></ul>
       </article>
 
       <!-- Penapis bulan & tahun -->
@@ -382,6 +385,6 @@
   </div>
 </dialog>
 
-<script src="script.js?v=25" defer></script>
+<script src="script.js?v=26" defer></script>
 </body>
 </html>
