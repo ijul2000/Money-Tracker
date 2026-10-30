@@ -119,15 +119,36 @@
   var modal = document.getElementById("addModal");
   var stepType = document.getElementById("stepType");
   var stepIncome = document.getElementById("stepIncome");
-  var stepSalary = document.getElementById("stepSalary");
-  var salaryForm = document.getElementById("salaryForm");
+  var stepForm = document.getElementById("stepForm");
+  var txForm = document.getElementById("txForm");
+  var formTitle = document.getElementById("txFormTitle");
+  var formHint = document.getElementById("txFormHint");
+  var currentCategory = null;
 
-  // Tukar antara langkah "type", "income" (kategori) dan "salary" (borang)
+  // Tajuk, penerangan dan contoh note bagi setiap kategori income
+  var CATEGORIES = {
+    "salary":       { title: "Salary",       hint: "Isi maklumat gaji.",                placeholder: "Contoh: Gaji bulan Oktober" },
+    "overtime":     { title: "Overtime",     hint: "Isi maklumat kerja lebih masa.",    placeholder: "Contoh: OT hujung minggu" },
+    "extra-income": { title: "Extra Income", hint: "Isi maklumat pendapatan tambahan.", placeholder: "Contoh: Jual barang terpakai" },
+    "balance":      { title: "Balance",      hint: "Isi maklumat baki sedia ada.",      placeholder: "Contoh: Baki bawa dari bulan lepas" }
+  };
+
+  function setCategory(cat) {
+    var info = CATEGORIES[cat];
+    if (!info) return false;
+    currentCategory = cat;
+    if (formTitle) formTitle.textContent = info.title;
+    if (formHint) formHint.textContent = info.hint;
+    if (txForm) txForm.elements.note.placeholder = info.placeholder;
+    return true;
+  }
+
+  // Tukar antara langkah "type", "income" (kategori) dan "form" (borang)
   function showStep(name) {
     if (!stepType || !stepIncome) return;
     stepType.hidden = (name !== "type");
     stepIncome.hidden = (name !== "income");
-    if (stepSalary) stepSalary.hidden = (name !== "salary");
+    if (stepForm) stepForm.hidden = (name !== "form");
   }
 
   // Tarikh hari ini (zon masa tempatan) dalam format YYYY-MM-DD
@@ -138,10 +159,10 @@
     return d.getFullYear() + "-" + m + "-" + day;
   }
 
-  function resetSalaryForm() {
-    if (!salaryForm) return;
-    salaryForm.reset();
-    salaryForm.elements.date.value = todayISO();
+  function resetForm() {
+    if (!txForm) return;
+    txForm.reset();
+    txForm.elements.date.value = todayISO();
   }
 
   function focusFirst(container, selector) {
@@ -151,7 +172,7 @@
 
   function openModal() {
     if (!modal) return;
-    resetSalaryForm();
+    resetForm();
     showStep("type");
     if (typeof modal.showModal === "function") {
       modal.showModal();
@@ -210,36 +231,37 @@
     // Langkah 2: kategori Income
     Array.prototype.forEach.call(modal.querySelectorAll("[data-category]"), function (b) {
       b.addEventListener("click", function () {
-        if (b.dataset.category === "salary") {
-          showStep("salary");
-          focusFirst(stepSalary, "input");
+        if (setCategory(b.dataset.category)) {
+          resetForm();
+          showStep("form");
+          focusFirst(stepForm, "input");
         } else {
           pick("income", b.dataset.category);
         }
       });
     });
 
-    // Butang kembali dari borang Salary ke senarai kategori
+    // Butang kembali dari borang ke senarai kategori ke senarai kategori
     Array.prototype.forEach.call(modal.querySelectorAll("[data-back-income]"), function (b) {
       b.addEventListener("click", function () {
         showStep("income");
-        focusFirst(stepIncome, '[data-category="salary"]');
+        focusFirst(stepIncome, '[data-category="' + currentCategory + '"]');
       });
     });
 
-    // Hantar borang Salary
-    if (salaryForm) {
-      salaryForm.addEventListener("submit", function (e) {
+    // Hantar borang (semua kategori income)
+    if (txForm) {
+      txForm.addEventListener("submit", function (e) {
         e.preventDefault();
-        var f = salaryForm.elements;
+        var f = txForm.elements;
         var amount = parseFloat(f.amount.value);
-        if (!f.date.value || !(amount > 0)) return;
+        if (!currentCategory || !f.date.value || !(amount > 0)) return;
 
         closeModal();
         document.dispatchEvent(new CustomEvent("transaction-save", {
           detail: {
             type: "income",
-            category: "salary",
+            category: currentCategory,
             date: f.date.value,
             amount: Math.round(amount * 100) / 100,
             note: f.note.value.trim()
