@@ -698,6 +698,7 @@ html.modal-open { overflow: hidden; }
   margin-top: 0.25rem;
   padding: 0.7rem 1.25rem;
   color: #fff;
+  background: var(--income);
   border: 0;
   border-radius: 14px;
   cursor: pointer;
@@ -706,7 +707,14 @@ html.modal-open { overflow: hidden; }
   touch-action: manipulation;
 }
 
-.btn-submit--income { background: var(--income); }
+/* Borang jenis Expense: guna warna expense */
+[data-kind="expense"] .field input:focus,
+[data-kind="expense"] .field textarea:focus {
+  border-color: var(--expense);
+  box-shadow: 0 0 0 3px var(--expense-bg);
+}
+
+[data-kind="expense"] .btn-submit { background: var(--expense); }
 .btn-submit:active { transform: scale(0.98); }
 .btn-submit:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 
@@ -715,7 +723,7 @@ html.modal-open { overflow: hidden; }
 }
 
 @media (prefers-color-scheme: dark) {
-  .btn-submit--income { color: #0b1514; }
+  .btn-submit { color: #0b1514; }
 }
 
 /* ---------- Animasi ---------- */
