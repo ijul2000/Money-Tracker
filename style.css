@@ -758,12 +758,6 @@ html.modal-open { overflow: hidden; }
   font-size: clamp(1.5rem, 6vw, 2rem);
 }
 
-.card-count {
-  margin-top: 0.2rem;
-  font-size: 0.78rem;
-  color: var(--muted);
-}
-
 @media (min-width: 640px) {
   .card--total {
     min-width: 14rem;
