@@ -1385,3 +1385,38 @@ body.page-bare .site-header { display: none; }
 body.page-bare main {
   padding-top: calc(1.5rem + env(safe-area-inset-top, 0px));
 }
+
+/* ---------- Butang Add Transaction: rekaan baru untuk telefon ---------- */
+@media (max-width: 639.98px) {
+  .btn-add--desktop {
+    gap: 0.6rem;
+    min-height: 46px;
+    padding: 0.3rem 1.05rem 0.3rem 0.35rem;
+    font-weight: 700;
+    color: #1a2523;
+    background: var(--accent);
+    border-color: var(--accent);
+    border-radius: 16px;
+    box-shadow: 0 8px 18px -8px rgba(217, 201, 160, 0.6);
+    transition: transform 0.2s var(--ease), background 0.25s, box-shadow 0.25s;
+  }
+
+  /* Ikon + dalam petak gelap */
+  .btn-add--desktop svg {
+    box-sizing: content-box;
+    width: 16px;
+    height: 16px;
+    padding: 7px;
+    color: var(--accent);
+    background: #1a2523;
+    border-radius: 12px;
+  }
+
+  .btn-add--desktop:active {
+    transform: scale(0.96);
+    background: #c9b88c;
+    border-color: #c9b88c;
+    color: #1a2523;
+    box-shadow: 0 3px 8px -4px rgba(217, 201, 160, 0.6);
+  }
+}
