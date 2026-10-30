@@ -1162,6 +1162,12 @@ html.modal-open { overflow: hidden; }
 .dn-total { font-size: 0.82rem; font-weight: 600; color: var(--ink); max-width: 62%; word-break: break-all; }
 .dn-total.is-long { font-size: 0.68rem; }
 
+.dn-card--link { cursor: pointer; }
+.dn-card--link:focus-visible {
+  outline: 2px solid var(--income);
+  outline-offset: 3px;
+}
+
 .card--income.dn-card  .dn-total { color: var(--income); }
 .card--expense.dn-card .dn-total { color: var(--expense); }
 
