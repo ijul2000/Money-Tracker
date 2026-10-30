@@ -1386,37 +1386,45 @@ body.page-bare main {
   padding-top: calc(1.5rem + env(safe-area-inset-top, 0px));
 }
 
-/* ---------- Butang Add Transaction: rekaan baru untuk telefon ---------- */
-@media (max-width: 639.98px) {
-  .btn-add--desktop {
-    gap: 0.6rem;
-    min-height: 46px;
-    padding: 0.3rem 1.05rem 0.3rem 0.35rem;
-    font-weight: 700;
-    color: #1a2523;
-    background: var(--accent);
-    border-color: var(--accent);
-    border-radius: 16px;
-    box-shadow: 0 8px 18px -8px rgba(217, 201, 160, 0.6);
-    transition: transform 0.2s var(--ease), background 0.25s, box-shadow 0.25s;
-  }
+/* ---------- Butang Add Transaction: ikon + sahaja (telefon & desktop) ---------- */
+.btn-add--desktop {
+  width: 48px;
+  height: 48px;
+  min-height: 0;
+  padding: 0;
+  gap: 0;
+  color: #1a2523;
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 16px;
+  box-shadow: 0 8px 18px -8px rgba(217, 201, 160, 0.6);
+  transition: transform 0.2s var(--ease), background 0.25s, box-shadow 0.25s;
+}
 
-  /* Ikon + dalam petak gelap */
-  .btn-add--desktop svg {
-    box-sizing: content-box;
-    width: 16px;
-    height: 16px;
-    padding: 7px;
-    color: var(--accent);
-    background: #1a2523;
-    border-radius: 12px;
-  }
+/* Perkataan "Add Transaction" disembunyikan (label aksesibiliti kekal pada butang) */
+.btn-add--desktop > span { display: none; }
 
-  .btn-add--desktop:active {
-    transform: scale(0.96);
-    background: #c9b88c;
-    border-color: #c9b88c;
-    color: #1a2523;
-    box-shadow: 0 3px 8px -4px rgba(217, 201, 160, 0.6);
+.btn-add--desktop svg {
+  width: 22px;
+  height: 22px;
+  stroke-width: 2.4;
+}
+
+@media (hover: hover) {
+  .btn-add--desktop:hover {
+    background: #e6d9b3;
+    border-color: #e6d9b3;
+    transform: translateY(-2px);
   }
+}
+
+.btn-add--desktop:active {
+  transform: scale(0.94);
+  background: #c9b88c;
+  border-color: #c9b88c;
+  box-shadow: 0 3px 8px -4px rgba(217, 201, 160, 0.6);
+}
+
+@media (min-width: 900px) {
+  .btn-add--desktop { width: 52px; height: 52px; }
 }
