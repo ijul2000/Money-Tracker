@@ -343,6 +343,11 @@
     var elExpense = document.getElementById("ovExpenseValue");
     var panel = document.getElementById("ovPanel");
     var panelText = document.getElementById("ovPanelText");
+    var cfCard = document.getElementById("cfCard");
+    var cfChart = document.getElementById("cfChart");
+    var cfTip = document.getElementById("cfTip");
+    var cfNet = document.getElementById("cfNet");
+    var cfBuckets = [];
 
     var data = { income: [], expense: [] };
     var loaded = false;
@@ -416,6 +421,221 @@
       }
     }
 
+    /* ----- Cash flow: kumpulan data ikut tempoh ----- */
+    function buildBuckets(inc, exp) {
+      var buckets = [];
+      var map = {};
+      function add(key, label, title) {
+        map[key] = { label: label, title: title, inflow: 0, outflow: 0 };
+        buckets.push(map[key]);
+      }
+
+      if (filterMonth !== "all" && filterYear !== "all") {
+        // Bulan tertentu -> ikut minggu (1-7, 8-14, 15-21, 22-28, 29+)
+        var days = new Date(Number(filterYear), Number(filterMonth), 0).getDate();
+        var weeks = Math.ceil(days / 7);
+        for (var w = 0; w < weeks; w++) {
+          var from = w * 7 + 1;
+          var to = Math.min(from + 6, days);
+          add("w" + w, "M" + (w + 1), "Minggu " + (w + 1) + " (" + from + "\u2013" + to + ")");
+        }
+        var keyOf = function (d) {
+          return "w" + Math.min(Math.floor((Number(d.slice(8, 10)) - 1) / 7), weeks - 1);
+        };
+        return fill(keyOf);
+      }
+
+      if (filterMonth === "all" && filterYear !== "all") {
+        // Setahun -> ikut bulan
+        MONTHS.forEach(function (m, i) { add(String(i + 1).padStart(2, "0"), m, MONTH_NAMES[i] + " " + filterYear); });
+        return fill(function (d) { return d.slice(5, 7); });
+      }
+
+      if (filterMonth !== "all") {
+        // Bulan tertentu, semua tahun -> ikut tahun
+        var ys = {};
+        inc.concat(exp).forEach(function (r) { ys[String(r.date).slice(0, 4)] = true; });
+        Object.keys(ys).sort().forEach(function (y) { add(y, y, MONTH_NAMES[Number(filterMonth) - 1] + " " + y); });
+        return fill(function (d) { return d.slice(0, 4); });
+      }
+
+      // Semua -> ikut tahun
+      var yrs = {};
+      inc.concat(exp).forEach(function (r) { yrs[String(r.date).slice(0, 4)] = true; });
+      Object.keys(yrs).sort().forEach(function (y) { add(y, y, "Tahun " + y); });
+      return fill(function (d) { return d.slice(0, 4); });
+
+      function fill(keyOf) {
+        inc.forEach(function (r) {
+          var b = map[keyOf(String(r.date))];
+          if (b) b.inflow += Number(r.amount || 0);
+        });
+        exp.forEach(function (r) {
+          var b = map[keyOf(String(r.date))];
+          if (b) b.outflow += Number(r.amount || 0);
+        });
+        return buckets;
+      }
+    }
+
+    function shortNum(n) {
+      if (n >= 1000000) return (n / 1000000).toFixed(n % 1000000 ? 1 : 0) + "j";
+      if (n >= 1000) return (n / 1000).toFixed(n % 1000 ? 1 : 0) + "k";
+      return String(Math.round(n));
+    }
+
+    function niceMax(v) {
+      if (v <= 0) return 100;
+      var p = Math.pow(10, Math.floor(Math.log(v) / Math.LN10));
+      var f = v / p;
+      var step = f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10;
+      return step * p;
+    }
+
+    function svgEl(name, attrs) {
+      var el = document.createElementNS("http://www.w3.org/2000/svg", name);
+      Object.keys(attrs || {}).forEach(function (k) { el.setAttribute(k, attrs[k]); });
+      return el;
+    }
+
+    function drawChart() {
+      if (!cfChart || !cfBuckets.length) return;
+      var W = cfChart.clientWidth;
+      if (!W) return;                       // masih tersembunyi
+      var H = W < 420 ? 220 : 260;
+      var padL = 40, padR = 6, padT = 10, padB = 26;
+      var plotW = W - padL - padR;
+      var plotH = H - padT - padB;
+
+      var maxVal = 0;
+      cfBuckets.forEach(function (b) { maxVal = Math.max(maxVal, b.inflow, b.outflow); });
+      var top = niceMax(maxVal);
+
+      var svg = svgEl("svg", { viewBox: "0 0 " + W + " " + H, width: W, height: H });
+
+      // Garisan grid + label paksi Y
+      for (var g = 0; g <= 4; g++) {
+        var val = top * g / 4;
+        var y = padT + plotH - (plotH * g / 4);
+        svg.appendChild(svgEl("line", { x1: padL, x2: W - padR, y1: y, y2: y, "class": "cf-grid" }));
+        var t = svgEl("text", { x: padL - 6, y: y + 4, "text-anchor": "end", "class": "cf-axis" });
+        t.textContent = shortNum(val);
+        svg.appendChild(t);
+      }
+
+      var n = cfBuckets.length;
+      var slot = plotW / n;
+      var barW = Math.max(4, Math.min(26, slot * 0.34));
+      var gap = Math.max(2, barW * 0.15);
+
+      cfBuckets.forEach(function (b, i) {
+        var cx = padL + slot * i + slot / 2;
+        var col = svgEl("g", { "class": "cf-col", "data-i": i });
+
+        function bar(value, cls, x) {
+          var h = top ? (value / top) * plotH : 0;
+          if (value > 0 && h < 2) h = 2;
+          var r = svgEl("rect", {
+            x: x, y: padT + plotH - h, width: barW, height: h,
+            rx: Math.min(4, barW / 2), "class": "cf-bar " + cls
+          });
+          col.appendChild(r);
+        }
+        bar(b.inflow, "cf-bar--in", cx - barW - gap / 2);
+        bar(b.outflow, "cf-bar--out", cx + gap / 2);
+
+        // Label paksi X (jarangkan kalau banyak)
+        var lbl = svgEl("text", { x: cx, y: H - 8, "text-anchor": "middle", "class": "cf-axis" });
+        lbl.textContent = b.label;
+        col.appendChild(lbl);
+
+        // Kawasan sentuh/hover
+        col.appendChild(svgEl("rect", { x: cx - slot / 2, y: padT, width: slot, height: plotH + padB, "class": "cf-hit" }));
+        svg.appendChild(col);
+      });
+
+      cfChart.textContent = "";
+      cfChart.appendChild(svg);
+    }
+
+    function showTip(i, colEl) {
+      var b = cfBuckets[i];
+      if (!b || !cfTip) return;
+      cfTip.textContent = "";
+      var t = document.createElement("strong");
+      t.textContent = b.title;
+      var a = document.createElement("div");
+      a.className = "in";
+      a.textContent = "Inflow: RM " + fmtNum(b.inflow);
+      var o = document.createElement("div");
+      o.className = "out";
+      o.textContent = "Outflow: RM " + fmtNum(b.outflow);
+      cfTip.appendChild(t); cfTip.appendChild(a); cfTip.appendChild(o);
+      cfTip.hidden = false;
+
+      var cardRect = cfCard.getBoundingClientRect();
+      var colRect = colEl.getBoundingClientRect();
+      var tipW = cfTip.offsetWidth;
+      var left = colRect.left - cardRect.left + colRect.width / 2 - tipW / 2;
+      left = Math.max(8, Math.min(left, cardRect.width - tipW - 8));
+      cfTip.style.left = left + "px";
+      cfTip.style.top = (colRect.top - cardRect.top - cfTip.offsetHeight - 6) + "px";
+    }
+
+    function hideTip() {
+      if (cfTip) cfTip.hidden = true;
+      var act = cfChart && cfChart.querySelector(".is-active");
+      if (act) act.classList.remove("is-active");
+    }
+
+    function renderCashFlow(inc, exp, totalInc, totalExp) {
+      if (!cfCard) return;
+      if (!inc.length && !exp.length) { cfCard.hidden = true; return; }
+
+      cfBuckets = buildBuckets(inc, exp);
+      cfCard.hidden = false;
+      hideTip();
+      drawChart();
+
+      if (cfNet) {
+        var net = totalInc - totalExp;
+        cfNet.textContent = "";
+        cfNet.appendChild(document.createTextNode("Aliran bersih: "));
+        var st = document.createElement("strong");
+        st.textContent = (net < 0 ? "\u2212" : "+") + "RM " + fmtNum(Math.abs(net));
+        cfNet.appendChild(st);
+      }
+    }
+
+    if (cfChart) {
+      cfChart.addEventListener("click", function (ev) {
+        var col = ev.target.closest && ev.target.closest(".cf-col");
+        if (!col) { hideTip(); return; }
+        hideTip();
+        col.classList.add("is-active");
+        showTip(Number(col.getAttribute("data-i")), col);
+      });
+      cfChart.addEventListener("mouseover", function (ev) {
+        var col = ev.target.closest && ev.target.closest(".cf-col");
+        if (col) showTip(Number(col.getAttribute("data-i")), col);
+      });
+      cfChart.addEventListener("mouseleave", hideTip);
+      document.addEventListener("click", function (ev) {
+        if (cfCard && !cfCard.contains(ev.target)) hideTip();
+      });
+
+      // Lukis semula bila saiz berubah (juga bila dashboard baru dipaparkan)
+      var lastW = 0;
+      if (window.ResizeObserver) {
+        new ResizeObserver(function () {
+          var w = cfChart.clientWidth;
+          if (w && w !== lastW) { lastW = w; drawChart(); }
+        }).observe(cfChart);
+      } else {
+        window.addEventListener("resize", drawChart);
+      }
+    }
+
     function render() {
       buildYears();
       var inc = data.income.filter(inPeriod);
@@ -425,6 +645,7 @@
 
       // Baki = jumlah income - jumlah expense bagi tempoh yang dipilih
       setValues(totalInc - totalExp, totalInc, totalExp);
+      renderCashFlow(inc, exp, totalInc, totalExp);
 
       if (!inc.length && !exp.length) {
         var label = periodLabel();
@@ -457,6 +678,7 @@
       }).catch(function () {
         if (!loaded) {
           setValues(null, null, null);
+          if (cfCard) cfCard.hidden = true;
           showPanel("Gagal memuatkan data.");
         } else {
           showToast("Gagal kemas kini overview", true);
