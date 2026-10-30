@@ -1379,3 +1379,9 @@ html.modal-open { overflow: hidden; }
 @media (min-width: 480px) {
   .add-more { display: inline; }
 }
+
+/* ---------- Halaman Income & Expense: header disembunyikan ---------- */
+body.page-bare .site-header { display: none; }
+body.page-bare main {
+  padding-top: calc(1.5rem + env(safe-area-inset-top, 0px));
+}
