@@ -73,8 +73,8 @@ body {
     var(--header);
   color: var(--header-text);
   border-bottom: 1px solid rgba(217, 201, 160, 0.28);
-  padding-top: calc(2rem + env(safe-area-inset-top, 0px));
-  padding-bottom: 1.5rem;
+  padding-top: calc(1.25rem + env(safe-area-inset-top, 0px));
+  padding-bottom: 1rem;
   padding-left: calc(var(--gutter) + env(safe-area-inset-left, 0px));
   padding-right: calc(var(--gutter) + env(safe-area-inset-right, 0px));
 }
@@ -87,7 +87,7 @@ body {
 .brand {
   font-family: "Instrument Serif", Georgia, "Times New Roman", serif;
   font-weight: 400;
-  font-size: clamp(2.75rem, 13vw, 7.5rem);
+  font-size: clamp(2rem, 9vw, 2.75rem);
   line-height: 0.95;
   letter-spacing: -0.02em;
   overflow-wrap: anywhere;
@@ -105,7 +105,7 @@ body {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 0.5rem;
-  margin-top: 1.5rem;
+  margin-top: 1rem;
 }
 
 .nav button {
@@ -317,8 +317,8 @@ h2 {
   }
 
   .site-header {
-    padding-top: calc(3rem + env(safe-area-inset-top, 0px));
-    padding-bottom: 2rem;
+    padding-top: calc(1.5rem + env(safe-area-inset-top, 0px));
+    padding-bottom: 1.5rem;
   }
 
   .header-inner {
@@ -329,7 +329,7 @@ h2 {
     gap: 1.5rem 2rem;
   }
 
-  .brand { font-size: clamp(2.25rem, 6.5vw, 3.75rem); }
+  .brand { font-size: clamp(1.75rem, 4.5vw, 2.5rem); }
 
   .nav {
     display: flex;
@@ -338,8 +338,8 @@ h2 {
   }
 
   .nav button {
-    font-size: 0.95rem;
-    padding: 0.6rem 1.5rem;
+    font-size: 0.9rem;
+    padding: 0.5rem 1.25rem;
   }
 
   main { padding-top: 2.5rem; }
@@ -358,17 +358,17 @@ h2 {
   }
 
   .site-header {
-    padding-top: calc(4.5rem + env(safe-area-inset-top, 0px));
-    padding-bottom: 2.5rem;
+    padding-top: calc(2rem + env(safe-area-inset-top, 0px));
+    padding-bottom: 2rem;
   }
 
-  .brand { font-size: clamp(3.75rem, 6vw, 5.5rem); }
+  .brand { font-size: clamp(2.5rem, 3.6vw, 3.25rem); }
 
   .nav { gap: 0.75rem; }
 
   .nav button {
-    font-size: 1rem;
-    padding: 0.7rem 1.75rem;
+    font-size: 0.95rem;
+    padding: 0.55rem 1.5rem;
   }
 
   main { padding-top: 3.5rem; padding-bottom: 5rem; }
@@ -384,10 +384,10 @@ h2 {
 /* Telefon landskap / skrin rendah */
 @media (max-height: 480px) and (orientation: landscape) {
   .site-header {
-    padding-top: calc(1rem + env(safe-area-inset-top, 0px));
-    padding-bottom: 1rem;
+    padding-top: calc(0.75rem + env(safe-area-inset-top, 0px));
+    padding-bottom: 0.75rem;
   }
-  .brand { font-size: clamp(2rem, 8vh, 3rem); }
+  .brand { font-size: clamp(1.75rem, 7vh, 2.25rem); }
 }
 
 @media (max-height: 480px) and (orientation: landscape) and (max-width: 639px) {
