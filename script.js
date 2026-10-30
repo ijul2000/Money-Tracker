@@ -153,6 +153,43 @@
       if (totalEl) totalEl.textContent = (total == null) ? "\u2014" : fmtNum(total);
     }
 
+    // Pecahan ikut kategori: amount + peratus (hanya jika kad ada ruang untuknya)
+    var bdEl = document.getElementById(type + "Breakdown");
+
+    function setBreakdown(list) {
+      if (!bdEl) return;
+      bdEl.textContent = "";
+
+      var byCat = {};
+      var sumAll = 0;
+      list.forEach(function (r) {
+        var amt = Number(r.amount || 0);
+        if (!(amt > 0)) return;
+        var k = r.category || "lain";
+        byCat[k] = (byCat[k] || 0) + amt;
+        sumAll += amt;
+      });
+      if (!sumAll) return;
+
+      Object.keys(byCat).map(function (k) {
+        return { key: k, value: byCat[k] };
+      }).sort(function (a, b) { return b.value - a.value; })
+        .forEach(function (it) {
+          var pct = it.value / sumAll * 100;
+          var li = el("li", "bd-item");
+          li.appendChild(el("span", "bd-name", catLabel(type, it.key)));
+          li.appendChild(el("span", "bd-amt", "RM " + fmtNum(it.value)));
+          li.appendChild(el("span", "bd-pct", (pct < 1 ? "<1" : String(Math.round(pct))) + "%"));
+          var bar = el("span", "bd-bar");
+          bar.setAttribute("aria-hidden", "true");
+          var fill = document.createElement("i");
+          fill.style.width = Math.max(2, Math.round(pct)) + "%";
+          bar.appendChild(fill);
+          li.appendChild(bar);
+          bdEl.appendChild(li);
+        });
+    }
+
     function renderState(msg, withRetry) {
       listEl.textContent = "";
       var box = el("div", "panel");
@@ -210,6 +247,7 @@
 
       if (!rows.length) {
         setTotal(0);
+        setBreakdown([]);
         renderState("Belum ada rekod " + type + ". Tekan Add Transaction untuk mula.");
         return;
       }
@@ -225,6 +263,7 @@
       // Jumlah dikira daripada semua rekod yang sepadan dengan penapis
       var total = filtered.reduce(function (s, r) { return s + Number(r.amount || 0); }, 0);
       setTotal(total);
+      setBreakdown(filtered);
 
       if (!filtered.length) {
         var label = periodLabel();
