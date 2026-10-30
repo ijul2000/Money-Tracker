@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=22">
+<link rel="stylesheet" href="style.css?v=23">
 </head>
 <body>
 
@@ -50,10 +50,17 @@
 <main>
   <!-- DASHBOARD -->
   <section id="dashboard">
-    <div class="section-head">
-      <h2>Overview</h2>
-      <p class="eyebrow eyebrow--date" id="today">Bulan ini</p>
-      <p class="intro">Ringkasan pendapatan dan perbelanjaan anda.</p>
+    <div class="section-head section-head--bar">
+      <div class="section-head-text">
+        <h2>Overview</h2>
+        <p class="eyebrow eyebrow--date" id="today">Bulan ini</p>
+      </div>
+
+      <!-- Penapis bulan & tahun (kanan, sebaris dengan Overview) -->
+      <div class="filters filters--compact" id="overviewFilters">
+        <div class="select-wrap"><select id="overviewMonth" aria-label="Bulan"></select></div>
+        <div class="select-wrap"><select id="overviewYear" aria-label="Tahun"></select></div>
+      </div>
     </div>
 
     <div class="cards">
@@ -64,7 +71,7 @@
           </span>
           Baki
         </div>
-        <p class="amount"><span class="cur">RM</span> 0.00</p>
+        <p class="amount"><span class="cur">RM</span> <span id="ovBalanceValue">0.00</span></p>
       </article>
 
       <article class="card card--income" style="--i:1">
@@ -74,7 +81,7 @@
           </span>
           Jumlah Income
         </div>
-        <p class="amount"><span class="cur">RM</span> 0.00</p>
+        <p class="amount"><span class="cur">RM</span> <span id="ovIncomeValue">0.00</span></p>
       </article>
 
       <article class="card card--expense" style="--i:2">
@@ -84,12 +91,12 @@
           </span>
           Jumlah Expense
         </div>
-        <p class="amount"><span class="cur">RM</span> 0.00</p>
+        <p class="amount"><span class="cur">RM</span> <span id="ovExpenseValue">0.00</span></p>
       </article>
     </div>
 
-    <div class="panel" style="--i:3">
-      <p>Belum ada rekod lagi. Tambah income atau expense untuk mula.</p>
+    <div class="panel" id="ovPanel" style="--i:3">
+      <p id="ovPanelText">Belum ada rekod lagi. Tambah income atau expense untuk mula.</p>
     </div>
   </section>
 
@@ -358,6 +365,6 @@
   </div>
 </dialog>
 
-<script src="script.js?v=22" defer></script>
+<script src="script.js?v=23" defer></script>
 </body>
 </html>
