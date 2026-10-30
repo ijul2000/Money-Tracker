@@ -627,93 +627,29 @@
       }
     }
 
-    /* ----- Donat income / expense ikut kategori ----- */
-    var DN_COLORS = {
-      income:  ["#2f7d5b", "#6fb58f", "#d9b96a", "#4a8fa3"],
-      expense: ["#b95a43", "#e0a15c", "#7a8f5b", "#4a8fa3", "#8c6bb1",
-                "#d4829a", "#c9b458", "#5f7d8c", "#a0674f"]
-    };
-
+    /* ----- Donat income / expense (satu warna, jumlah di tengah) ----- */
     var dn = {
       income:  { chart: document.getElementById("dnIncomeChart"),
                  total: document.getElementById("dnIncomeTotal"),
-                 legend: document.getElementById("dnIncomeLegend") },
+                 color: "var(--income)" },
       expense: { chart: document.getElementById("dnExpenseChart"),
                  total: document.getElementById("dnExpenseTotal"),
-                 legend: document.getElementById("dnExpenseLegend") }
+                 color: "var(--expense)" }
     };
     var dnGrid = document.getElementById("dnGrid");
 
-    function drawDonut(type, list) {
+    function drawDonut(type, total) {
       var ui = dn[type];
       if (!ui || !ui.chart) return;
-
-      // Jumlah ikut kategori, besar ke kecil
-      var byCat = {};
-      list.forEach(function (r) {
-        var k = r.category || "lain";
-        byCat[k] = (byCat[k] || 0) + Number(r.amount || 0);
-      });
-      var items = Object.keys(byCat).map(function (k) {
-        return { key: k, value: byCat[k] };
-      }).filter(function (it) { return it.value > 0; })
-        .sort(function (a, b) { return b.value - a.value; });
-      var total = items.reduce(function (s, it) { return s + it.value; }, 0);
 
       ui.total.textContent = fmtNum(total);
       ui.total.classList.toggle("is-long", ui.total.textContent.length > 9);
 
-      var R = 46, SW = 15, C = 2 * Math.PI * R;
       var svg = svgEl("svg", { viewBox: "0 0 120 120" });
-      svg.appendChild(svgEl("circle", { cx: 60, cy: 60, r: R, "stroke-width": SW, "class": "dn-track" }));
-
-      var palette = DN_COLORS[type];
-      var offset = 0;
-      ui.legend.textContent = "";
-
-      items.forEach(function (it, i) {
-        var color = palette[i % palette.length];
-        var len = it.value / total * C;
-        var gap = items.length > 1 ? Math.min(1.5, len / 3) : 0;
-        var seg = svgEl("circle", {
-          cx: 60, cy: 60, r: R, "stroke-width": SW, "class": "dn-seg",
-          stroke: color,
-          "stroke-dasharray": (len - gap) + " " + (C - len + gap),
-          "stroke-dashoffset": -offset,
-          transform: "rotate(-90 60 60)"
-        });
-        var tt = svgEl("title", {});
-        tt.textContent = catLabel(type, it.key) + ": RM " + fmtNum(it.value);
-        seg.appendChild(tt);
-        svg.appendChild(seg);
-        offset += len;
-
-        var pct = it.value / total * 100;
-        var li = document.createElement("li");
-        var dot = document.createElement("span");
-        dot.className = "dn-dot";
-        dot.style.background = color;
-        var name = document.createElement("span");
-        name.className = "dn-name";
-        name.appendChild(document.createTextNode(catLabel(type, it.key)));
-        var amt = document.createElement("small");
-        amt.textContent = "RM " + fmtNum(it.value);
-        name.appendChild(amt);
-        var p = document.createElement("span");
-        p.className = "dn-pct";
-        p.textContent = (pct > 0 && pct < 1 ? "<1" : String(Math.round(pct))) + "%";
-        li.appendChild(dot); li.appendChild(name); li.appendChild(p);
-        ui.legend.appendChild(li);
-      });
-
-      if (!items.length) {
-        var e = document.createElement("li");
-        e.className = "dn-empty";
-        e.style.display = "block";
-        e.textContent = "Tiada rekod";
-        ui.legend.appendChild(e);
-      }
-
+      svg.appendChild(svgEl("circle", {
+        cx: 60, cy: 60, r: 46, "stroke-width": 15, "class": "dn-ring",
+        stroke: ui.color, fill: "none", opacity: total > 0 ? 1 : 0.25
+      }));
       ui.chart.textContent = "";
       ui.chart.appendChild(svg);
     }
@@ -722,8 +658,8 @@
       if (!dnGrid) return;
       if (!inc.length && !exp.length) { dnGrid.hidden = true; return; }
       dnGrid.hidden = false;
-      drawDonut("income", inc);
-      drawDonut("expense", exp);
+      drawDonut("income", sum(inc));
+      drawDonut("expense", sum(exp));
     }
 
     function render() {
