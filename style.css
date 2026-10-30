@@ -62,7 +62,6 @@ body {
   line-height: 1.6;
   min-height: 100vh;
   min-height: 100dvh;
-  overflow-x: hidden;
 }
 
 /* ---------- Header ---------- */
@@ -104,13 +103,14 @@ body {
   color: var(--accent);
 }
 
-/* ---------- Butang menu (3 garis) - telefon ---------- */
+/* ---------- Butang 3 garis (telefon) ---------- */
 .nav-toggle {
   display: grid;
   place-items: center;
   flex-shrink: 0;
   width: 44px;
   height: 44px;
+  padding: 0;
   color: var(--header-text);
   background: rgba(243, 241, 234, 0.06);
   border: 1px solid rgba(243, 241, 234, 0.2);
@@ -142,23 +142,20 @@ body {
   height: 2px;
   border-radius: 2px;
   background: currentColor;
-  transition: transform 0.35s var(--ease), opacity 0.2s;
+  transition: transform 0.3s var(--ease), opacity 0.2s;
 }
 
 .nav-toggle[aria-expanded="true"] .bars span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
 .nav-toggle[aria-expanded="true"] .bars span:nth-child(2) { opacity: 0; }
 .nav-toggle[aria-expanded="true"] .bars span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
-/* ---------- Navbar: panel jatuh bawah pada telefon ---------- */
+/* ---------- Navbar (telefon): tersembunyi, keluar bila 3 garis ditekan ---------- */
 .nav {
-  --nav-radius: 14px;
+  display: none;
   position: absolute;
   top: 100%;
   left: 0;
   right: 0;
-  z-index: 40;
-  isolation: isolate;
-  display: flex;
   flex-direction: column;
   gap: 0.25rem;
   padding: 0.75rem calc(var(--gutter) + env(safe-area-inset-right, 0px))
@@ -166,22 +163,14 @@ body {
   background: var(--header);
   border-bottom: 1px solid rgba(217, 201, 160, 0.25);
   box-shadow: 0 28px 40px -24px rgba(0, 0, 0, 0.55);
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(-8px);
-  transition: opacity 0.25s var(--ease),
-              transform 0.3s var(--ease),
-              visibility 0s linear 0.3s;
 }
 
 .nav.is-open {
-  opacity: 1;
-  visibility: visible;
-  transform: none;
-  transition: opacity 0.25s var(--ease),
-              transform 0.35s var(--ease),
-              visibility 0s;
+  display: flex;
+  animation: drop 0.25s var(--ease) both;
 }
+
+.nav-indicator { display: none; }
 
 .nav button {
   font: inherit;
@@ -191,29 +180,19 @@ body {
   color: var(--header-muted);
   background: transparent;
   border: 0;
-  border-radius: var(--nav-radius);
+  border-radius: 14px;
   min-height: 48px;
   padding: 0.75rem 1rem;
   cursor: pointer;
-  opacity: 0;
-  transform: translateY(-6px);
   transition: color 0.25s, background 0.25s;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
 
-.nav.is-open button {
-  opacity: 1;
-  transform: none;
-  transition: color 0.25s,
-              background 0.25s,
-              opacity 0.35s var(--ease) calc(var(--n, 0) * 50ms + 40ms),
-              transform 0.35s var(--ease) calc(var(--n, 0) * 50ms + 40ms);
+.nav button[aria-current="page"] {
+  background: var(--accent);
+  color: #1a2523;
 }
-
-.nav button:nth-of-type(1) { --n: 0; }
-.nav button:nth-of-type(2) { --n: 1; }
-.nav button:nth-of-type(3) { --n: 2; }
 
 .nav button:focus-visible {
   outline: 2px solid var(--accent);
@@ -222,36 +201,6 @@ body {
 
 @media (hover: hover) {
   .nav button:not([aria-current="page"]):hover { color: var(--header-text); }
-}
-
-/* Butang aktif sebelum penanda siap diukur */
-.nav:not(.has-indicator) button[aria-current="page"] {
-  background: var(--accent);
-}
-
-.nav button[aria-current="page"] { color: #1a2523; }
-
-/* Penanda emas yang meluncur */
-.nav-indicator {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 0;
-  height: 0;
-  border-radius: var(--nav-radius);
-  background: var(--accent);
-  box-shadow: 0 8px 20px -8px rgba(217, 201, 160, 0.5);
-  z-index: -1;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.nav.has-indicator .nav-indicator { opacity: 1; }
-
-.nav.is-ready .nav-indicator {
-  transition: transform 0.45s var(--ease),
-              width 0.45s var(--ease),
-              height 0.45s var(--ease);
 }
 
 /* ---------- Kandungan ---------- */
@@ -310,7 +259,7 @@ h2 {
   box-shadow: var(--shadow);
   animation: rise 0.6s var(--ease) both;
   animation-delay: calc(var(--i, 0) * 90ms + 80ms);
-  transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease);
+  transition: transform 0.3s var(--ease);
 }
 
 @media (hover: hover) {
@@ -388,6 +337,11 @@ h2 {
   to   { opacity: 1; transform: none; }
 }
 
+@keyframes drop {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: none; }
+}
+
 /* =========================================================
    Responsif
    ========================================================= */
@@ -406,16 +360,18 @@ h2 {
 
   .brand { font-size: clamp(1.75rem, 4.5vw, 2.5rem); }
 
+  /* Butang 3 garis tidak diperlukan */
   .nav-toggle { display: none; }
 
-  /* Navbar menjadi pil bersegmen */
-  .nav {
-    --nav-radius: 999px;
+  /* Navbar sentiasa kelihatan sebagai pil bersegmen */
+  .nav,
+  .nav.is-open {
+    display: flex;
     position: relative;
     top: auto;
     left: auto;
     right: auto;
-    z-index: auto;
+    isolation: isolate;
     flex-direction: row;
     gap: 2px;
     padding: 4px;
@@ -423,19 +379,43 @@ h2 {
     border: 1px solid rgba(243, 241, 234, 0.14);
     border-radius: 999px;
     box-shadow: none;
-    opacity: 1;
-    visibility: visible;
-    transform: none;
-    transition: none;
+    animation: none;
   }
 
   .nav button {
     font-size: 0.9rem;
     text-align: center;
+    border-radius: 999px;
     min-height: 40px;
     padding: 0.45rem 1.2rem;
-    opacity: 1;
-    transform: none;
+  }
+
+  /* Penanda emas yang meluncur */
+  .nav-indicator {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-radius: 999px;
+    background: var(--accent);
+    box-shadow: 0 8px 20px -8px rgba(217, 201, 160, 0.5);
+    z-index: -1;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .nav.has-indicator .nav-indicator { opacity: 1; }
+
+  .nav.is-ready .nav-indicator {
+    transition: transform 0.45s var(--ease),
+                width 0.45s var(--ease),
+                height 0.45s var(--ease);
+  }
+
+  .nav.has-indicator button[aria-current="page"] {
+    background: transparent;
   }
 
   main { padding-top: 2.5rem; }
