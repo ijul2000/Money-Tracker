@@ -9,7 +9,7 @@
 
   var PAGES = ["dashboard", "income", "expense"];
   var TITLES = {
-    dashboard: "Dashboard",
+    dashboard: "Overview",
     income: "Income",
     expense: "Expense"
   };
