@@ -4,6 +4,9 @@
 (function () {
   "use strict";
 
+  // URL Web App Google Apps Script (Deploy > Web app > salin URL berakhir /exec)
+  var SHEET_URL = "";
+
   var PAGES = ["dashboard", "income", "expense"];
   var TITLES = {
     dashboard: "Dashboard",
@@ -114,6 +117,48 @@
       location.hash = b.dataset.page;
     });
   });
+
+  /* ---------- Toast & simpan ke Google Sheet ---------- */
+  var toastEl = null;
+  var toastTimer = null;
+
+  function showToast(msg, isError) {
+    if (!toastEl) {
+      toastEl = document.createElement("div");
+      toastEl.className = "toast";
+      toastEl.setAttribute("role", "status");
+      toastEl.setAttribute("aria-live", "polite");
+      document.body.appendChild(toastEl);
+    }
+    // Modal <dialog> berada di "top layer", jadi toast mesti masuk dalam dialog bila ia terbuka
+    var host = (modal && modal.open) ? modal : document.body;
+    if (toastEl.parentNode !== host) host.appendChild(toastEl);
+    toastEl.textContent = msg;
+    toastEl.classList.toggle("toast--error", !!isError);
+    // reflow supaya animasi main semula
+    toastEl.classList.remove("is-show");
+    void toastEl.offsetWidth;
+    toastEl.classList.add("is-show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () {
+      toastEl.classList.remove("is-show");
+    }, 3200);
+  }
+
+  // Content-Type text/plain supaya tiada preflight CORS (Apps Script tak sokong OPTIONS)
+  function saveToSheet(detail) {
+    return fetch(SHEET_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(detail)
+    }).then(function (res) {
+      if (!res.ok) throw new Error("Server " + res.status);
+      return res.json();
+    }).then(function (out) {
+      if (!out || !out.ok) throw new Error((out && out.error) || "Ralat tidak diketahui");
+      return out;
+    });
+  }
 
   /* ---------- Modal Add Transaction ---------- */
   var modal = document.getElementById("addModal");
@@ -269,25 +314,50 @@
       });
     });
 
-    // Hantar borang (semua kategori income & expense)
+    // Hantar borang (semua kategori income & expense) -> simpan ke Google Sheet
     if (txForm) {
+      var submitBtn = txForm.querySelector(".btn-submit");
+
       txForm.addEventListener("submit", function (e) {
         e.preventDefault();
+        if (txForm.dataset.busy === "1") return;
+
         var f = txForm.elements;
         var amount = parseFloat(f.amount.value);
         if (!currentCategory || !f.date.value || !(amount > 0)) return;
 
-        closeModal();
-        document.dispatchEvent(new CustomEvent("transaction-save", {
-          detail: {
-            type: currentType,
-            category: currentCategory,
-            date: f.date.value,
-            amount: Math.round(amount * 100) / 100,
-            note: f.note.value.trim()
-          }
-        }));
+        var detail = {
+          type: currentType,
+          category: currentCategory,
+          date: f.date.value,
+          amount: Math.round(amount * 100) / 100,
+          note: f.note.value.trim()
+        };
+
+        if (!SHEET_URL) {
+          showToast("URL Google Sheet belum diset dalam script.js", true);
+          return;
+        }
+
+        setBusy(true);
+        saveToSheet(detail).then(function () {
+          setBusy(false);
+          closeModal();
+          showToast("Transaksi disimpan");
+          document.dispatchEvent(new CustomEvent("transaction-save", { detail: detail }));
+        }).catch(function (err) {
+          setBusy(false);
+          showToast("Gagal simpan: " + (err && err.message ? err.message : "cuba lagi"), true);
+        });
       });
+
+      function setBusy(on) {
+        txForm.dataset.busy = on ? "1" : "0";
+        if (submitBtn) {
+          submitBtn.disabled = on;
+          submitBtn.textContent = on ? "Menyimpan..." : "Simpan";
+        }
+      }
     }
 
     // Butang kembali
