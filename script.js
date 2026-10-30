@@ -794,19 +794,6 @@
     show(location.hash.slice(1));
   });
 
-  /* ---------- Tarikh hari ini ---------- */
-  var todayEl = document.getElementById("today");
-  if (todayEl) {
-    try {
-      todayEl.textContent = new Date().toLocaleDateString("ms-MY", {
-        month: "long",
-        year: "numeric"
-      });
-    } catch (e) {
-      /* kekalkan teks asal jika pelayar tidak menyokong */
-    }
-  }
-
   /* ---------- Mula ---------- */
   // Utamakan hash dalam URL; kalau tiada, guna halaman terakhir yang disimpan
   var startPage = location.hash.slice(1);
