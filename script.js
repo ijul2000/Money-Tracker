@@ -338,9 +338,6 @@
   var overview = (function () {
     var monthSel = document.getElementById("overviewMonth");
     var yearSel = document.getElementById("overviewYear");
-    var elBalance = document.getElementById("ovBalanceValue");
-    var elIncome = document.getElementById("ovIncomeValue");
-    var elExpense = document.getElementById("ovExpenseValue");
     var panel = document.getElementById("ovPanel");
     var panelText = document.getElementById("ovPanelText");
     var cfCard = document.getElementById("cfCard");
@@ -403,12 +400,6 @@
       if (m) return "bulan " + m;
       if (y) return "tahun " + y;
       return "";
-    }
-
-    function setValues(b, i, e) {
-      if (elBalance) elBalance.textContent = (b == null) ? "\u2014" : fmtNum(b);
-      if (elIncome) elIncome.textContent = (i == null) ? "\u2014" : fmtNum(i);
-      if (elExpense) elExpense.textContent = (e == null) ? "\u2014" : fmtNum(e);
     }
 
     function showPanel(msg) {
@@ -643,8 +634,6 @@
       var totalInc = sum(inc);
       var totalExp = sum(exp);
 
-      // Baki = jumlah income - jumlah expense bagi tempoh yang dipilih
-      setValues(totalInc - totalExp, totalInc, totalExp);
       renderCashFlow(inc, exp, totalInc, totalExp);
 
       if (!inc.length && !exp.length) {
@@ -677,7 +666,6 @@
         render();
       }).catch(function () {
         if (!loaded) {
-          setValues(null, null, null);
           if (cfCard) cfCard.hidden = true;
           showPanel("Gagal memuatkan data.");
         } else {
