@@ -95,6 +95,15 @@
   var incomeLoaded = false;
   var incomeLoading = false;
   var incomeReload = false;
+  var MAX_INCOME_ROWS = 31;   // had rekod yang dipaparkan
+  var MONTH_NAMES = ["Januari", "Februari", "Mac", "April", "Mei", "Jun", "Julai",
+                     "Ogos", "September", "Oktober", "November", "Disember"];
+  var monthSel = document.getElementById("incomeMonth");
+  var yearSel = document.getElementById("incomeYear");
+  var nowDate = new Date();
+  // Lalai: bulan & tahun semasa
+  var filterMonth = String(nowDate.getMonth() + 1).padStart(2, "0");
+  var filterYear = String(nowDate.getFullYear());
   var MONTHS = ["Jan", "Feb", "Mac", "Apr", "Mei", "Jun", "Jul", "Ogo", "Sep", "Okt", "Nov", "Dis"];
 
   function el(tag, cls, text) {
@@ -146,21 +155,85 @@
     incomeList.appendChild(box);
   }
 
+  function option(value, label) {
+    var o = document.createElement("option");
+    o.value = value;
+    o.textContent = label;
+    return o;
+  }
+
+  // Pilihan bulan (tetap)
+  function buildMonthOptions() {
+    if (!monthSel) return;
+    monthSel.textContent = "";
+    monthSel.appendChild(option("all", "Semua bulan"));
+    MONTH_NAMES.forEach(function (name, i) {
+      monthSel.appendChild(option(String(i + 1).padStart(2, "0"), name));
+    });
+    monthSel.value = filterMonth;
+  }
+
+  // Pilihan tahun: tahun yang ada dalam data + tahun semasa
+  function buildYearOptions() {
+    if (!yearSel) return;
+    var years = {};
+    years[String(nowDate.getFullYear())] = true;
+    incomeRows.forEach(function (r) {
+      var y = String(r.date).slice(0, 4);
+      if (/^\d{4}$/.test(y)) years[y] = true;
+    });
+    var list = Object.keys(years).sort().reverse();
+
+    yearSel.textContent = "";
+    yearSel.appendChild(option("all", "Semua tahun"));
+    list.forEach(function (y) { yearSel.appendChild(option(y, y)); });
+
+    if (filterYear !== "all" && !years[filterYear]) filterYear = "all";
+    yearSel.value = filterYear;
+  }
+
+  function periodLabel() {
+    var m = filterMonth !== "all" ? MONTH_NAMES[Number(filterMonth) - 1] : "";
+    var y = filterYear !== "all" ? filterYear : "";
+    if (m && y) return m + " " + y;
+    if (m) return "bulan " + m;
+    if (y) return "tahun " + y;
+    return "";
+  }
+
   function renderIncome() {
+    buildYearOptions();
+
     if (!incomeRows.length) {
       setIncomeTotal(0);
       renderIncomeState("Belum ada rekod income. Tekan Add Transaction untuk mula.");
       return;
     }
 
-    var rows = incomeRows.slice().sort(function (a, b) {
+    // Tapis ikut bulan & tahun yang dipilih
+    var filtered = incomeRows.filter(function (r) {
+      var d = String(r.date);
+      if (filterYear !== "all" && d.slice(0, 4) !== filterYear) return false;
+      if (filterMonth !== "all" && d.slice(5, 7) !== filterMonth) return false;
+      return true;
+    });
+
+    // Jumlah dikira daripada semua rekod yang sepadan dengan penapis
+    var total = filtered.reduce(function (s, r) { return s + Number(r.amount || 0); }, 0);
+    setIncomeTotal(total);
+
+    if (!filtered.length) {
+      var label = periodLabel();
+      renderIncomeState("Tiada rekod income" + (label ? " untuk " + label : "") + ".");
+      return;
+    }
+
+    filtered.sort(function (a, b) {
       if (a.date !== b.date) return a.date < b.date ? 1 : -1;
       return String(a.timestamp) < String(b.timestamp) ? 1 : -1;
     });
 
-    var total = rows.reduce(function (s, r) { return s + Number(r.amount || 0); }, 0);
-
-    setIncomeTotal(total);
+    var rows = filtered.slice(0, MAX_INCOME_ROWS);
 
     incomeList.textContent = "";
 
@@ -186,6 +259,28 @@
       list.appendChild(item);
     });
     incomeList.appendChild(list);
+
+    if (filtered.length > MAX_INCOME_ROWS) {
+      incomeList.appendChild(el("p", "records-note",
+        "Menunjukkan " + MAX_INCOME_ROWS + " rekod terbaru daripada " + filtered.length +
+        ". Pilih bulan tertentu untuk kecilkan senarai."));
+    }
+  }
+
+  buildMonthOptions();
+  buildYearOptions();
+
+  if (monthSel) {
+    monthSel.addEventListener("change", function () {
+      filterMonth = monthSel.value;
+      if (incomeLoaded) renderIncome();
+    });
+  }
+  if (yearSel) {
+    yearSel.addEventListener("change", function () {
+      filterYear = yearSel.value;
+      if (incomeLoaded) renderIncome();
+    });
   }
 
   function loadIncome() {
