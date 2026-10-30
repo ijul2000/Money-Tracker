@@ -1359,3 +1359,23 @@ html.modal-open { overflow: hidden; }
     scroll-behavior: auto !important;
   }
 }
+
+/* ---------- Header: hanya butang Add Transaction ---------- */
+/* Navbar (Overview / Income / Expense) dan butang 3 garis disembunyikan.
+   Elemen kekal dalam HTML supaya navigasi melalui kad masih berfungsi. */
+.nav,
+.nav.is-open,
+.nav-toggle {
+  display: none !important;
+}
+
+/* Butang Add Transaction sentiasa kelihatan, termasuk di telefon */
+.btn-add--desktop {
+  display: inline-flex;
+  min-height: 46px;
+  padding: 0.45rem 1.1rem;
+}
+
+@media (min-width: 480px) {
+  .add-more { display: inline; }
+}
