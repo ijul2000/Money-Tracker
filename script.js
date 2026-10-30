@@ -334,6 +334,158 @@
     expense: createRecordsPage("expense")
   };
 
+  /* ---------- Overview: jumlah ikut bulan & tahun ---------- */
+  var overview = (function () {
+    var monthSel = document.getElementById("overviewMonth");
+    var yearSel = document.getElementById("overviewYear");
+    var elBalance = document.getElementById("ovBalanceValue");
+    var elIncome = document.getElementById("ovIncomeValue");
+    var elExpense = document.getElementById("ovExpenseValue");
+    var panel = document.getElementById("ovPanel");
+    var panelText = document.getElementById("ovPanelText");
+
+    var data = { income: [], expense: [] };
+    var loaded = false;
+    var loading = false;
+    var reload = false;
+
+    // Lalai: bulan & tahun semasa
+    var filterMonth = String(nowDate.getMonth() + 1).padStart(2, "0");
+    var filterYear = String(nowDate.getFullYear());
+
+    function buildMonths() {
+      if (!monthSel) return;
+      monthSel.textContent = "";
+      monthSel.appendChild(option("all", "Semua"));
+      MONTH_NAMES.forEach(function (name, i) {
+        monthSel.appendChild(option(String(i + 1).padStart(2, "0"), name));
+      });
+      monthSel.value = filterMonth;
+    }
+
+    function buildYears() {
+      if (!yearSel) return;
+      var years = {};
+      years[String(nowDate.getFullYear())] = true;
+      data.income.concat(data.expense).forEach(function (r) {
+        var y = String(r.date).slice(0, 4);
+        if (/^\d{4}$/.test(y)) years[y] = true;
+      });
+      yearSel.textContent = "";
+      yearSel.appendChild(option("all", "Semua"));
+      Object.keys(years).sort().reverse().forEach(function (y) {
+        yearSel.appendChild(option(y, y));
+      });
+      if (filterYear !== "all" && !years[filterYear]) filterYear = "all";
+      yearSel.value = filterYear;
+    }
+
+    function inPeriod(r) {
+      var d = String(r.date);
+      if (filterYear !== "all" && d.slice(0, 4) !== filterYear) return false;
+      if (filterMonth !== "all" && d.slice(5, 7) !== filterMonth) return false;
+      return true;
+    }
+
+    function sum(list) {
+      return list.reduce(function (s, r) { return s + Number(r.amount || 0); }, 0);
+    }
+
+    function periodLabel() {
+      var m = filterMonth !== "all" ? MONTH_NAMES[Number(filterMonth) - 1] : "";
+      var y = filterYear !== "all" ? filterYear : "";
+      if (m && y) return m + " " + y;
+      if (m) return "bulan " + m;
+      if (y) return "tahun " + y;
+      return "";
+    }
+
+    function setValues(b, i, e) {
+      if (elBalance) elBalance.textContent = (b == null) ? "\u2014" : fmtNum(b);
+      if (elIncome) elIncome.textContent = (i == null) ? "\u2014" : fmtNum(i);
+      if (elExpense) elExpense.textContent = (e == null) ? "\u2014" : fmtNum(e);
+    }
+
+    function showPanel(msg) {
+      if (!panel) return;
+      if (msg) {
+        panelText.textContent = msg;
+        panel.hidden = false;
+      } else {
+        panel.hidden = true;
+      }
+    }
+
+    function render() {
+      buildYears();
+      var inc = data.income.filter(inPeriod);
+      var exp = data.expense.filter(inPeriod);
+      var totalInc = sum(inc);
+      var totalExp = sum(exp);
+
+      // Baki = jumlah income - jumlah expense bagi tempoh yang dipilih
+      setValues(totalInc - totalExp, totalInc, totalExp);
+
+      if (!inc.length && !exp.length) {
+        var label = periodLabel();
+        showPanel("Tiada rekod" + (label ? " untuk " + label : "") + ".");
+      } else {
+        showPanel(null);
+      }
+    }
+
+    function load() {
+      if (!SHEET_URL) {
+        showPanel("URL Google Sheet belum diset dalam script.js.");
+        return;
+      }
+      if (loading) { reload = true; return; }
+      loading = true;
+
+      var url = SHEET_URL + (SHEET_URL.indexOf("?") === -1 ? "?" : "&") +
+                "action=list&t=" + Date.now();
+
+      fetch(url).then(function (res) {
+        if (!res.ok) throw new Error("Server " + res.status);
+        return res.json();
+      }).then(function (out) {
+        if (!out || !out.ok) throw new Error((out && out.error) || "Ralat tidak diketahui");
+        data.income = out.income || [];
+        data.expense = out.expense || [];
+        loaded = true;
+        render();
+      }).catch(function () {
+        if (!loaded) {
+          setValues(null, null, null);
+          showPanel("Gagal memuatkan data.");
+        } else {
+          showToast("Gagal kemas kini overview", true);
+        }
+      }).then(function () {
+        loading = false;
+        if (reload) { reload = false; load(); }
+      });
+    }
+
+    buildMonths();
+    buildYears();
+
+    if (monthSel) {
+      monthSel.addEventListener("change", function () {
+        filterMonth = monthSel.value;
+        if (loaded) render();
+      });
+    }
+    if (yearSel) {
+      yearSel.addEventListener("change", function () {
+        filterYear = yearSel.value;
+        if (loaded) render();
+      });
+    }
+
+    return { load: load };
+  })();
+
   /* ---------- Ingat halaman terakhir (kekal selepas refresh) ---------- */
   var STORE_KEY = "moneyTracker.page";
 
@@ -365,6 +517,7 @@
     document.title = TITLES[page] + " \u00B7 Money Tracker";
     savePage(page);
     if (recordPages[page]) recordPages[page].load();
+    if (page === "dashboard") overview.load();
     moveIndicator();
   }
 
@@ -604,6 +757,7 @@
           showToast("Transaksi disimpan");
           document.dispatchEvent(new CustomEvent("transaction-save", { detail: detail }));
           if (recordPages[detail.type]) recordPages[detail.type].load();
+          overview.load();
         }).catch(function (err) {
           setBusy(false);
           showToast("Gagal simpan: " + (err && err.message ? err.message : "cuba lagi"), true);
