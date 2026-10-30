@@ -16,7 +16,8 @@
 
   var toggle = document.getElementById("navToggle");
   var indicator = nav.querySelector(".nav-indicator");
-  var buttons = Array.prototype.slice.call(nav.querySelectorAll("button"));
+  var buttons = Array.prototype.slice.call(nav.querySelectorAll("button[data-page]"));
+  var addButtons = Array.prototype.slice.call(document.querySelectorAll('[data-action="add"]'));
   var wide = window.matchMedia("(min-width: 640px)");
 
   /* ---------- Penanda emas yang meluncur (tablet & desktop sahaja) ---------- */
@@ -111,6 +112,15 @@
       setMenu(false);
       if (location.hash.slice(1) === b.dataset.page) return;
       location.hash = b.dataset.page;
+    });
+  });
+
+  // Butang Add Transaction: tutup menu telefon, kemudian beritahu halaman
+  // (borang tambah transaksi boleh disambungkan pada event "add-transaction")
+  addButtons.forEach(function (b) {
+    b.addEventListener("click", function () {
+      setMenu(false);
+      document.dispatchEvent(new CustomEvent("add-transaction"));
     });
   });
 
