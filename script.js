@@ -776,6 +776,23 @@
     });
   });
 
+  /* ---------- Kad di Overview yang boleh diklik -> buka halaman berkaitan ---------- */
+  Array.prototype.forEach.call(document.querySelectorAll("[data-goto]"), function (el) {
+    function go() {
+      var page = el.getAttribute("data-goto");
+      if (PAGES.indexOf(page) === -1) return;
+      if (location.hash.slice(1) === page) { show(page); return; }
+      location.hash = page;
+    }
+    el.addEventListener("click", go);
+    el.addEventListener("keydown", function (ev) {
+      if (ev.key === "Enter" || ev.key === " ") {
+        ev.preventDefault();
+        go();
+      }
+    });
+  });
+
   /* ---------- Toast & simpan ke Google Sheet ---------- */
   var toastEl = null;
   var toastTimer = null;
