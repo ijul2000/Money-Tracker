@@ -1,762 +1,246 @@
 /* =========================================================
-   Money Tracker - style.css
+   Money Tracker - script.js
    ========================================================= */
-
-/* ---------- Token warna & ukuran ---------- */
-:root {
-  --bg: #eef1ef;
-  --ink: #14211f;
-  --muted: #5d6d6a;
-  --line: #d5dcd9;
-  --surface: #f9fbfa;
-
-  --header: #0f2a2b;
-  --header-text: #f3f1ea;
-  --header-muted: #9db3b0;
-  --accent: #d9c9a0;
-
-  --income: #2f7d5b;
-  --income-bg: rgba(47, 125, 91, 0.12);
-  --expense: #b95a43;
-  --expense-bg: rgba(185, 90, 67, 0.12);
-
-  --shadow: 0 1px 2px rgba(15, 42, 43, 0.05),
-            0 14px 32px -14px rgba(15, 42, 43, 0.2);
-  --radius: 20px;
-  --ease: cubic-bezier(0.22, 0.8, 0.26, 1);
-
-  --gutter: 1.25rem;
-  --content-max: 100%;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0b1514;
-    --ink: #e8eeec;
-    --muted: #94a8a5;
-    --line: #223634;
-    --surface: #112321;
-
-    --income: #5fc79a;
-    --income-bg: rgba(95, 199, 154, 0.14);
-    --expense: #e48a72;
-    --expense-bg: rgba(228, 138, 114, 0.14);
-
-    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3),
-              0 14px 32px -14px rgba(0, 0, 0, 0.6);
-  }
-}
-
-/* ---------- Asas ---------- */
-* { box-sizing: border-box; margin: 0; }
-
-html {
-  -webkit-text-size-adjust: 100%;
-  scroll-behavior: smooth;
-}
-
-body {
-  background: var(--bg);
-  color: var(--ink);
-  font-family: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
-  line-height: 1.6;
-  min-height: 100vh;
-  min-height: 100dvh;
-}
-
-/* ---------- Header ---------- */
-.site-header {
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  background:
-    radial-gradient(700px 260px at 92% -60%, rgba(217, 201, 160, 0.18), transparent 65%),
-    var(--header);
-  color: var(--header-text);
-  border-bottom: 1px solid rgba(217, 201, 160, 0.25);
-  padding-top: calc(0.85rem + env(safe-area-inset-top, 0px));
-  padding-bottom: 0.85rem;
-  padding-left: calc(var(--gutter) + env(safe-area-inset-left, 0px));
-  padding-right: calc(var(--gutter) + env(safe-area-inset-right, 0px));
-}
-
-.header-inner {
-  max-width: var(--content-max);
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 0.75rem 1rem;
-}
-
-.brand {
-  font-family: "Instrument Serif", Georgia, "Times New Roman", serif;
-  font-weight: 400;
-  font-size: clamp(2rem, 9vw, 2.5rem);
-  line-height: 1;
-  letter-spacing: -0.02em;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.brand em {
-  font-style: italic;
-  color: var(--accent);
-}
-
-/* ---------- Butang 3 garis (telefon) ---------- */
-.nav-toggle {
-  display: grid;
-  place-items: center;
-  flex-shrink: 0;
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  color: var(--header-text);
-  background: rgba(243, 241, 234, 0.06);
-  border: 1px solid rgba(243, 241, 234, 0.2);
-  border-radius: 14px;
-  cursor: pointer;
-  transition: background 0.25s, border-color 0.25s;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-}
-
-.nav-toggle:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 3px;
-}
-
-.nav-toggle[aria-expanded="true"] {
-  background: rgba(217, 201, 160, 0.12);
-  border-color: var(--accent);
-}
-
-.bars {
-  display: grid;
-  gap: 5px;
-  width: 20px;
-}
-
-.bars span {
-  display: block;
-  height: 2px;
-  border-radius: 2px;
-  background: currentColor;
-  transition: transform 0.3s var(--ease), opacity 0.2s;
-}
-
-.nav-toggle[aria-expanded="true"] .bars span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-.nav-toggle[aria-expanded="true"] .bars span:nth-child(2) { opacity: 0; }
-.nav-toggle[aria-expanded="true"] .bars span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-
-/* ---------- Navbar (telefon): tersembunyi, keluar bila 3 garis ditekan ---------- */
-.nav {
-  display: none;
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  flex-direction: column;
-  gap: 0.25rem;
-  padding: 0.75rem calc(var(--gutter) + env(safe-area-inset-right, 0px))
-           1rem calc(var(--gutter) + env(safe-area-inset-left, 0px));
-  background: var(--header);
-  border-bottom: 1px solid rgba(217, 201, 160, 0.25);
-  box-shadow: 0 28px 40px -24px rgba(0, 0, 0, 0.55);
-}
-
-.nav.is-open {
-  display: flex;
-  animation: drop 0.25s var(--ease) both;
-}
-
-.nav-indicator { display: none; }
-
-.nav button {
-  font: inherit;
-  font-size: 1rem;
-  font-weight: 500;
-  text-align: left;
-  color: var(--header-muted);
-  background: transparent;
-  border: 0;
-  border-radius: 14px;
-  min-height: 48px;
-  padding: 0.75rem 1rem;
-  cursor: pointer;
-  transition: color 0.25s, background 0.25s;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-}
-
-.nav button[aria-current="page"] {
-  background: var(--accent);
-  color: #1a2523;
-}
-
-.nav button:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-@media (hover: hover) {
-  .nav button[data-page]:not([aria-current="page"]):hover { color: var(--header-text); }
-}
-
-/* ---------- Kumpulan kanan header & butang Add Transaction ---------- */
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-left: auto;
-}
-
-.btn-add {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  font: inherit;
-  font-size: 0.9rem;
-  font-weight: 600;
-  white-space: nowrap;
-  color: var(--accent);
-  background: transparent;
-  border: 1px solid rgba(217, 201, 160, 0.55);
-  border-radius: 999px;
-  min-height: 44px;
-  padding: 0.5rem 1.1rem;
-  cursor: pointer;
-  transition: background 0.25s, color 0.25s, border-color 0.25s;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-}
-
-.btn-add svg { flex-shrink: 0; }
-
-.btn-add:active {
-  background: var(--accent);
-  color: #1a2523;
-  border-color: var(--accent);
-}
-
-.btn-add:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 3px;
-}
-
-@media (hover: hover) {
-  .btn-add:hover {
-    background: var(--accent);
-    color: #1a2523;
-    border-color: var(--accent);
-  }
-}
-
-/* Telefon: butang di dalam menu, atas Dashboard */
-.btn-add--desktop { display: none; }
-
-.nav .btn-add--menu {
-  width: 100%;
-  min-height: 48px;
-  margin-bottom: 0.5rem;
-  border-radius: 14px;
-  font-size: 1rem;
-  font-weight: 600;
-  text-align: center;
-  color: var(--accent);
-  border: 1px solid rgba(217, 201, 160, 0.55);
-}
-
-@media (hover: hover) {
-  .nav .btn-add--menu:hover {
-    color: #1a2523;
-    border-color: var(--accent);
-  }
-}
-
-.add-more { display: none; }
-
-/* ---------- Kandungan ---------- */
-main {
-  max-width: var(--content-max);
-  margin: 0 auto;
-  padding-top: 2rem;
-  padding-bottom: calc(3rem + env(safe-area-inset-bottom, 0px));
-  padding-left: calc(var(--gutter) + env(safe-area-inset-left, 0px));
-  padding-right: calc(var(--gutter) + env(safe-area-inset-right, 0px));
-}
-
-section[hidden] { display: none; }
-
-section:not([hidden]) {
-  animation: rise 0.55s var(--ease) both;
-}
-
-.section-head { margin-bottom: 1.5rem; }
-
-.eyebrow {
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 0.25rem;
-}
-
-h2 {
-  font-family: "Instrument Serif", Georgia, serif;
-  font-weight: 400;
-  font-size: clamp(2rem, 6vw, 3rem);
-  line-height: 1.1;
-  letter-spacing: -0.01em;
-}
-
-.intro {
-  color: var(--muted);
-  max-width: 52ch;
-  margin-top: 0.35rem;
-}
-
-/* ---------- Kad ringkasan ---------- */
-.cards {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
-}
-
-.card {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  padding: 1.35rem 1.5rem 1.5rem;
-  box-shadow: var(--shadow);
-  animation: rise 0.6s var(--ease) both;
-  animation-delay: calc(var(--i, 0) * 90ms + 80ms);
-  transition: transform 0.3s var(--ease);
-}
-
-@media (hover: hover) {
-  .card:hover { transform: translateY(-3px); }
-}
-
-.card-label {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  font-size: 0.88rem;
-  font-weight: 500;
-  color: var(--muted);
-}
-
-.card-icon {
-  display: grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 12px;
-  background: var(--line);
-  color: var(--ink);
-}
-
-.amount {
-  margin-top: 1.1rem;
-  font-family: "Instrument Serif", Georgia, serif;
-  font-size: clamp(2.1rem, 6vw, 2.75rem);
-  line-height: 1.05;
-  letter-spacing: -0.01em;
-  font-variant-numeric: tabular-nums;
-}
-
-.cur {
-  font-family: "Manrope", system-ui, sans-serif;
-  font-size: 0.45em;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  color: var(--muted);
-  margin-right: 0.15em;
-  vertical-align: 0.55em;
-}
-
-.card--income .card-icon { background: var(--income-bg); color: var(--income); }
-.card--expense .card-icon { background: var(--expense-bg); color: var(--expense); }
-
-.card--primary {
-  background:
-    radial-gradient(420px 220px at 100% 0%, rgba(217, 201, 160, 0.22), transparent 65%),
-    var(--header);
-  border-color: transparent;
-  color: var(--header-text);
-}
-
-.card--primary .card-label { color: var(--header-muted); }
-.card--primary .card-icon { background: rgba(217, 201, 160, 0.16); color: var(--accent); }
-.card--primary .cur { color: var(--accent); }
-
-/* ---------- Panel kosong ---------- */
-.panel {
-  margin-top: 1.25rem;
-  padding: 2.25rem 1.5rem;
-  border: 1px dashed var(--line);
-  border-radius: var(--radius);
-  text-align: center;
-  color: var(--muted);
-  animation: rise 0.6s var(--ease) both;
-  animation-delay: calc(var(--i, 0) * 90ms + 80ms);
-}
-
-/* ---------- Modal Add Transaction ---------- */
-html.modal-open { overflow: hidden; }
-
-.modal {
-  margin: auto;                      /* reset global margin supaya modal di tengah */
-  padding: 0;
-  width: min(420px, calc(100% - 2rem));
-  max-height: calc(100dvh - 2rem);
-  overflow: auto;
-  color: var(--ink);
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 24px;
-  box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.5);
-}
-
-.modal[open] { animation: pop 0.3s var(--ease) both; }
-
-.modal::backdrop {
-  background: rgba(6, 18, 17, 0.6);
-  -webkit-backdrop-filter: blur(4px);
-  backdrop-filter: blur(4px);
-}
-
-.modal-body { padding: 1.5rem; }
-
-.modal-head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 1.25rem;
-}
-
-.modal h2 {
-  font-size: 1.9rem;
-  line-height: 1.1;
-}
-
-.modal-head p {
-  margin-top: 0.2rem;
-  font-size: 0.92rem;
-  color: var(--muted);
-}
-
-.modal-close {
-  flex-shrink: 0;
-  display: grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  padding: 0;
-  color: var(--muted);
-  background: transparent;
-  border: 1px solid var(--line);
-  border-radius: 50%;
-  cursor: pointer;
-  transition: color 0.2s, border-color 0.2s;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-}
-
-.modal-close:focus-visible {
-  outline: 2px solid var(--ink);
-  outline-offset: 2px;
-}
-
-@media (hover: hover) {
-  .modal-close:hover { color: var(--ink); border-color: var(--muted); }
-}
-
-.choices {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 0.75rem;
-}
-
-.choice {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.15rem;
-  font: inherit;
-  text-align: left;
-  color: inherit;
-  background: var(--bg);
-  border: 1px solid var(--line);
-  border-radius: 18px;
-  padding: 1.1rem;
-  cursor: pointer;
-  transition: transform 0.25s var(--ease), border-color 0.25s, box-shadow 0.25s;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-}
-
-.choice:active { transform: scale(0.98); }
-
-.choice-icon {
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  margin-bottom: 0.6rem;
-  border-radius: 14px;
-}
-
-.choice--income .choice-icon  { background: var(--income-bg);  color: var(--income); }
-.choice--expense .choice-icon { background: var(--expense-bg); color: var(--expense); }
-
-.choice-title {
-  font-size: 1.05rem;
-  font-weight: 600;
-}
-
-.choice-desc {
-  font-size: 0.85rem;
-  color: var(--muted);
-}
-
-.choice--income:focus-visible  { outline: 2px solid var(--income);  outline-offset: 2px; }
-.choice--expense:focus-visible { outline: 2px solid var(--expense); outline-offset: 2px; }
-
-@media (hover: hover) {
-  .choice:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
-  .choice--income:hover  { border-color: var(--income); }
-  .choice--expense:hover { border-color: var(--expense); }
-}
-
-/* Langkah kategori: kepala dengan butang kembali + senarai baris */
-.modal-head .grow {
-  flex: 1;
-  min-width: 0;
-}
-
-.modal-back {
-  flex-shrink: 0;
-  display: grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  padding: 0;
-  color: var(--muted);
-  background: transparent;
-  border: 1px solid var(--line);
-  border-radius: 50%;
-  cursor: pointer;
-  transition: color 0.2s, border-color 0.2s;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-}
-
-.modal-back:focus-visible {
-  outline: 2px solid var(--ink);
-  outline-offset: 2px;
-}
-
-@media (hover: hover) {
-  .modal-back:hover { color: var(--ink); border-color: var(--muted); }
-}
-
-.modal-step--sub:not([hidden]) {
-  animation: step-in 0.28s var(--ease) both;
-}
-
-.choices--list { grid-template-columns: 1fr; }
-
-.choice--row {
-  flex-direction: row;
-  align-items: center;
-  gap: 0.9rem;
-  padding: 0.85rem 1rem;
-}
-
-.choice--row .choice-icon { margin-bottom: 0; }
-
-.choice-text {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-/* ---------- Animasi ---------- */
-@keyframes rise {
-  from { opacity: 0; transform: translateY(14px); }
-  to   { opacity: 1; transform: none; }
-}
-
-@keyframes pop {
-  from { opacity: 0; transform: translateY(12px) scale(0.96); }
-  to   { opacity: 1; transform: none; }
-}
-
-@keyframes step-in {
-  from { opacity: 0; transform: translateX(14px); }
-  to   { opacity: 1; transform: none; }
-}
-
-@keyframes drop {
-  from { opacity: 0; transform: translateY(-8px); }
-  to   { opacity: 1; transform: none; }
-}
-
-/* =========================================================
-   Responsif
-   ========================================================= */
-
-/* Tablet & desktop (640px ke atas): tajuk kiri, navbar kanan sebaris */
-@media (min-width: 640px) {
-  :root {
-    --gutter: 2rem;
-    --content-max: 760px;
+(function () {
+  "use strict";
+
+  var PAGES = ["dashboard", "income", "expense"];
+  var TITLES = {
+    dashboard: "Dashboard",
+    income: "Income",
+    expense: "Expense"
+  };
+
+  var nav = document.getElementById("nav");
+  if (!nav) return;
+
+  var toggle = document.getElementById("navToggle");
+  var indicator = nav.querySelector(".nav-indicator");
+  var buttons = Array.prototype.slice.call(nav.querySelectorAll("button[data-page]"));
+  var addButtons = Array.prototype.slice.call(document.querySelectorAll('[data-action="add"]'));
+  var wide = window.matchMedia("(min-width: 640px)");
+
+  /* ---------- Penanda emas yang meluncur (tablet & desktop sahaja) ---------- */
+  function moveIndicator() {
+    if (!indicator || !wide.matches) return;
+
+    var active = nav.querySelector('button[aria-current="page"]');
+    if (!active) return;
+
+    var first = !nav.classList.contains("has-indicator");
+    if (first) nav.classList.remove("is-ready");
+
+    indicator.style.width = active.offsetWidth + "px";
+    indicator.style.height = active.offsetHeight + "px";
+    indicator.style.transform =
+      "translate(" + active.offsetLeft + "px," + active.offsetTop + "px)";
+    nav.classList.add("has-indicator");
+
+    // Kali pertama: letak terus tanpa animasi, kemudian hidupkan animasi
+    if (first) {
+      void indicator.offsetWidth;
+      requestAnimationFrame(function () {
+        nav.classList.add("is-ready");
+      });
+    }
   }
 
-  .site-header {
-    padding-top: calc(1rem + env(safe-area-inset-top, 0px));
-    padding-bottom: 1rem;
+  /* ---------- Menu 3 garis (telefon) ---------- */
+  function setMenu(open) {
+    nav.classList.toggle("is-open", open);
+    if (toggle) {
+      toggle.setAttribute("aria-expanded", open ? "true" : "false");
+      toggle.setAttribute("aria-label", open ? "Tutup menu" : "Buka menu");
+    }
   }
 
-  .brand { font-size: clamp(1.75rem, 4.5vw, 2.5rem); }
-
-  /* Butang 3 garis tidak diperlukan */
-  .nav-toggle { display: none; }
-
-  /* Navbar sentiasa kelihatan sebagai pil bersegmen */
-  .nav,
-  .nav.is-open {
-    display: flex;
-    position: relative;
-    top: auto;
-    left: auto;
-    right: auto;
-    isolation: isolate;
-    flex-direction: row;
-    gap: 2px;
-    padding: 4px;
-    background: rgba(243, 241, 234, 0.06);
-    border: 1px solid rgba(243, 241, 234, 0.14);
-    border-radius: 999px;
-    box-shadow: none;
-    animation: none;
+  if (toggle) {
+    toggle.addEventListener("click", function () {
+      setMenu(!nav.classList.contains("is-open"));
+    });
   }
 
-  .nav button {
-    font-size: 0.9rem;
-    text-align: center;
-    border-radius: 999px;
-    min-height: 40px;
-    padding: 0.45rem 1.2rem;
+  // Tutup bila tekan di luar header
+  document.addEventListener("click", function (e) {
+    if (nav.classList.contains("is-open") && !e.target.closest(".site-header")) {
+      setMenu(false);
+    }
+  });
+
+  // Tutup dengan butang Escape
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && nav.classList.contains("is-open")) {
+      setMenu(false);
+      if (toggle) toggle.focus();
+    }
+  });
+
+  // Bila saiz skrin bertukar antara telefon dan tablet/desktop
+  function onBreakpoint() {
+    setMenu(false);
+    moveIndicator();
+  }
+  if (wide.addEventListener) {
+    wide.addEventListener("change", onBreakpoint);
+  } else if (wide.addListener) {
+    wide.addListener(onBreakpoint);
   }
 
-  /* Penanda emas yang meluncur */
-  .nav-indicator {
-    display: block;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 0;
-    height: 0;
-    border-radius: 999px;
-    background: var(--accent);
-    box-shadow: 0 8px 20px -8px rgba(217, 201, 160, 0.5);
-    z-index: -1;
-    opacity: 0;
-    pointer-events: none;
+  /* ---------- Tukar halaman ---------- */
+  function show(page) {
+    if (PAGES.indexOf(page) === -1) page = "dashboard";
+
+    PAGES.forEach(function (p) {
+      var el = document.getElementById(p);
+      if (el) el.hidden = (p !== page);
+    });
+
+    buttons.forEach(function (b) {
+      if (b.dataset.page === page) {
+        b.setAttribute("aria-current", "page");
+      } else {
+        b.removeAttribute("aria-current");
+      }
+    });
+
+    document.title = TITLES[page] + " \u00B7 Money Tracker";
+    moveIndicator();
   }
 
-  .nav.has-indicator .nav-indicator { opacity: 1; }
+  buttons.forEach(function (b) {
+    b.addEventListener("click", function () {
+      setMenu(false);
+      if (location.hash.slice(1) === b.dataset.page) return;
+      location.hash = b.dataset.page;
+    });
+  });
 
-  .nav.is-ready .nav-indicator {
-    transition: transform 0.45s var(--ease),
-                width 0.45s var(--ease),
-                height 0.45s var(--ease);
+  /* ---------- Modal Add Transaction ---------- */
+  var modal = document.getElementById("addModal");
+  var stepType = document.getElementById("stepType");
+  var stepIncome = document.getElementById("stepIncome");
+
+  // Tukar antara langkah "type" (Income/Expense) dan "income" (kategori)
+  function showStep(name) {
+    if (!stepType || !stepIncome) return;
+    stepType.hidden = (name !== "type");
+    stepIncome.hidden = (name !== "income");
   }
 
-  .nav.has-indicator button[aria-current="page"] {
-    background: transparent;
+  function focusFirst(container, selector) {
+    var el = container && container.querySelector(selector);
+    if (el) el.focus();
   }
 
-  /* Add Transaction di sebelah kiri navbar */
-  .btn-add--desktop {
-    display: inline-flex;
-    min-height: 50px;
-    padding: 0.45rem 1.1rem;
+  function openModal() {
+    if (!modal) return;
+    showStep("type");
+    if (typeof modal.showModal === "function") {
+      modal.showModal();
+    } else {
+      modal.setAttribute("open", "");
+    }
+    document.documentElement.classList.add("modal-open");
   }
 
-  .nav .btn-add--menu { display: none; }
-
-  main { padding-top: 2.5rem; }
-}
-
-/* Label penuh "Add Transaction" apabila ruang mencukupi */
-@media (min-width: 900px) {
-  .add-more { display: inline; }
-}
-
-/* Kad tiga lajur apabila ruang mencukupi */
-@media (min-width: 700px) {
-  .cards { grid-template-columns: repeat(3, 1fr); }
-}
-
-/* Desktop (1024px ke atas) */
-@media (min-width: 1024px) {
-  :root {
-    --gutter: 3rem;
-    --content-max: 1080px;
+  function closeModal() {
+    if (!modal) return;
+    if (typeof modal.close === "function") {
+      modal.close();
+    } else {
+      modal.removeAttribute("open");
+      document.documentElement.classList.remove("modal-open");
+    }
   }
 
-  .site-header {
-    padding-top: calc(1.15rem + env(safe-area-inset-top, 0px));
-    padding-bottom: 1.15rem;
+  // Tutup modal dan beritahu halaman apa yang dipilih
+  // (borang transaksi boleh disambungkan pada event "transaction-select")
+  function pick(type, category) {
+    closeModal();
+    document.dispatchEvent(new CustomEvent("transaction-select", {
+      detail: { type: type, category: category }
+    }));
   }
 
-  .brand { font-size: clamp(2.5rem, 3.6vw, 3.25rem); }
+  if (modal) {
+    // Buang kunci skrol bila modal ditutup (termasuk dengan Escape)
+    modal.addEventListener("close", function () {
+      document.documentElement.classList.remove("modal-open");
+    });
 
-  .nav button {
-    font-size: 0.95rem;
-    min-height: 42px;
-    padding: 0.5rem 1.5rem;
+    // Tekan di luar kotak modal (pada latar gelap) untuk tutup
+    modal.addEventListener("click", function (e) {
+      if (e.target === modal) closeModal();
+    });
+
+    Array.prototype.forEach.call(modal.querySelectorAll("[data-close]"), function (b) {
+      b.addEventListener("click", closeModal);
+    });
+
+    // Langkah 1: Income -> pilih kategori; Expense -> terus pilih
+    Array.prototype.forEach.call(modal.querySelectorAll("[data-type]"), function (b) {
+      b.addEventListener("click", function () {
+        if (b.dataset.type === "income") {
+          showStep("income");
+          focusFirst(stepIncome, ".choice");
+        } else {
+          pick(b.dataset.type, null);
+        }
+      });
+    });
+
+    // Langkah 2: kategori Income
+    Array.prototype.forEach.call(modal.querySelectorAll("[data-category]"), function (b) {
+      b.addEventListener("click", function () {
+        pick("income", b.dataset.category);
+      });
+    });
+
+    // Butang kembali
+    Array.prototype.forEach.call(modal.querySelectorAll("[data-back]"), function (b) {
+      b.addEventListener("click", function () {
+        showStep("type");
+        focusFirst(stepType, '[data-type="income"]');
+      });
+    });
   }
 
-  .btn-add--desktop {
-    min-height: 52px;
-    padding: 0.5rem 1.4rem;
-    font-size: 0.95rem;
+  // Butang Add Transaction: tutup menu telefon, kemudian buka modal
+  addButtons.forEach(function (b) {
+    b.addEventListener("click", function () {
+      setMenu(false);
+      openModal();
+    });
+  });
+
+  window.addEventListener("hashchange", function () {
+    show(location.hash.slice(1));
+  });
+
+  /* ---------- Tarikh hari ini ---------- */
+  var todayEl = document.getElementById("today");
+  if (todayEl) {
+    try {
+      todayEl.textContent = new Date().toLocaleDateString("ms-MY", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+      });
+    } catch (e) {
+      /* kekalkan teks asal jika pelayar tidak menyokong */
+    }
   }
 
-  main { padding-top: 3.5rem; padding-bottom: 5rem; }
+  /* ---------- Mula ---------- */
+  show(location.hash.slice(1));
 
-  .card { padding: 1.6rem 1.75rem 1.75rem; }
-}
-
-/* Skrin besar */
-@media (min-width: 1440px) {
-  :root { --content-max: 1240px; }
-}
-
-/* Telefon landskap / skrin rendah */
-@media (max-height: 480px) and (orientation: landscape) {
-  .site-header {
-    padding-top: calc(0.5rem + env(safe-area-inset-top, 0px));
-    padding-bottom: 0.5rem;
+  // Kira semula kedudukan penanda apabila saiz skrin atau fon berubah
+  window.addEventListener("resize", moveIndicator);
+  if (window.ResizeObserver) {
+    new ResizeObserver(moveIndicator).observe(nav);
   }
-  .brand { font-size: clamp(1.75rem, 7vh, 2.25rem); }
-}
-
-/* Kurangkan gerakan */
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation: none !important;
-    transition: none !important;
-    scroll-behavior: auto !important;
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(moveIndicator);
   }
-}
+})();
