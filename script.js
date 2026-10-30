@@ -772,6 +772,10 @@
       }
     });
 
+    // Header hanya dipaparkan di Overview; disembunyikan di halaman Income & Expense
+    document.body.classList.toggle("page-bare", page !== "dashboard");
+    if (page !== "dashboard") window.scrollTo(0, 0);
+
     document.title = TITLES[page] + " \u00B7 Money Tracker";
     savePage(page);
     if (recordPages[page]) recordPages[page].load();
