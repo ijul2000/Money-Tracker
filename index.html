@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=19">
+<link rel="stylesheet" href="style.css?v=20">
 </head>
 <body>
 
@@ -133,13 +133,39 @@
 
   <!-- EXPENSE -->
   <section id="expense" hidden>
-    <div class="section-head">
-      <p class="eyebrow">Perbelanjaan</p>
-      <h2>Expense</h2>
-      <p class="intro">Rekod perbelanjaan harian anda.</p>
+    <div class="section-head section-head--split">
+      <div class="section-head-text">
+        <p class="eyebrow">Perbelanjaan</p>
+        <h2>Expense</h2>
+        <p class="intro">Rekod perbelanjaan harian anda.</p>
+      </div>
+
+      <!-- Kad jumlah expense (kanan atas) -->
+      <article class="card card--expense card--total" id="expenseTotal">
+        <div class="card-label">
+          <span class="card-icon">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m6 11 6-6 6 6"/></svg>
+          </span>
+          Jumlah Expense
+        </div>
+        <p class="amount"><span class="cur">RM</span> <span id="expenseTotalValue">&mdash;</span></p>
+      </article>
+
+      <!-- Penapis bulan & tahun -->
+      <div class="filters" id="expenseFilters">
+        <div class="field">
+          <label for="expenseMonth">Bulan</label>
+          <div class="select-wrap"><select id="expenseMonth"></select></div>
+        </div>
+        <div class="field">
+          <label for="expenseYear">Tahun</label>
+          <div class="select-wrap"><select id="expenseYear"></select></div>
+        </div>
+      </div>
     </div>
-    <div class="panel" style="--i:0">
-      <p>Rekod perbelanjaan akan dipaparkan di sini.</p>
+
+    <div id="expenseList" aria-live="polite">
+      <div class="panel"><p>Memuatkan rekod...</p></div>
     </div>
   </section>
 </main>
@@ -332,6 +358,6 @@
   </div>
 </dialog>
 
-<script src="script.js?v=19" defer></script>
+<script src="script.js?v=20" defer></script>
 </body>
 </html>
