@@ -826,6 +826,11 @@ html.modal-open { overflow: hidden; }
   box-shadow: 0 0 0 3px var(--income-bg);
 }
 
+#expense .filters select:focus {
+  border-color: var(--expense);
+  box-shadow: 0 0 0 3px var(--expense-bg);
+}
+
 .records-note {
   margin-top: 0.9rem;
   font-size: 0.85rem;
@@ -869,6 +874,13 @@ html.modal-open { overflow: hidden; }
   background: var(--income-bg);
   border-radius: 999px;
 }
+
+.record--expense .record-cat {
+  color: var(--expense);
+  background: var(--expense-bg);
+}
+
+.record--expense .record-amount { color: var(--expense); }
 
 .record-date {
   grid-area: date;
