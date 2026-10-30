@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=6">
+<link rel="stylesheet" href="style.css?v=7">
 </head>
 <body>
 
@@ -121,36 +121,78 @@
 <!-- MODAL: pilih jenis transaksi -->
 <dialog class="modal" id="addModal" aria-labelledby="addModalTitle">
   <div class="modal-body">
-    <div class="modal-head">
-      <div>
-        <h2 id="addModalTitle">Add Transaction</h2>
-        <p>Pilih jenis transaksi.</p>
+
+    <!-- Langkah 1: pilih jenis transaksi -->
+    <div class="modal-step" id="stepType">
+      <div class="modal-head">
+        <div class="grow">
+          <h2 id="addModalTitle">Add Transaction</h2>
+          <p>Pilih jenis transaksi.</p>
+        </div>
+        <button class="modal-close" type="button" data-close aria-label="Tutup"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
       </div>
-      <button class="modal-close" type="button" data-close aria-label="Tutup">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
-      </button>
+
+      <div class="choices">
+        <button class="choice choice--income" type="button" data-type="income">
+          <span class="choice-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="m6 13 6 6 6-6"/></svg></span>
+          <span class="choice-title">Income</span>
+          <span class="choice-desc">Wang masuk</span>
+        </button>
+
+        <button class="choice choice--expense" type="button" data-type="expense">
+          <span class="choice-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m6 11 6-6 6 6"/></svg></span>
+          <span class="choice-title">Expense</span>
+          <span class="choice-desc">Wang keluar</span>
+        </button>
+      </div>
     </div>
 
-    <div class="choices">
-      <button class="choice choice--income" type="button" data-type="income">
-        <span class="choice-icon">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="m6 13 6 6 6-6"/></svg>
-        </span>
-        <span class="choice-title">Income</span>
-        <span class="choice-desc">Wang masuk</span>
-      </button>
+    <!-- Langkah 2: kategori Income -->
+    <div class="modal-step modal-step--sub" id="stepIncome" hidden>
+      <div class="modal-head">
+        <button class="modal-back" type="button" data-back aria-label="Kembali"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg></button>
+        <div class="grow">
+          <h2>Income</h2>
+          <p>Pilih kategori income.</p>
+        </div>
+        <button class="modal-close" type="button" data-close aria-label="Tutup"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      </div>
 
-      <button class="choice choice--expense" type="button" data-type="expense">
-        <span class="choice-icon">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m6 11 6-6 6 6"/></svg>
-        </span>
-        <span class="choice-title">Expense</span>
-        <span class="choice-desc">Wang keluar</span>
-      </button>
+      <div class="choices choices--list">
+        <button class="choice choice--income choice--row" type="button" data-category="salary">
+          <span class="choice-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6.5 9.5v.01M17.5 14.5v.01"/></svg></span>
+          <span class="choice-text">
+            <span class="choice-title">Salary</span>
+            <span class="choice-desc">Gaji</span>
+          </span>
+        </button>
+        <button class="choice choice--income choice--row" type="button" data-category="overtime">
+          <span class="choice-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+          <span class="choice-text">
+            <span class="choice-title">Overtime</span>
+            <span class="choice-desc">Kerja lebih masa</span>
+          </span>
+        </button>
+        <button class="choice choice--income choice--row" type="button" data-category="extra-income">
+          <span class="choice-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 17 6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg></span>
+          <span class="choice-text">
+            <span class="choice-title">Extra Income</span>
+            <span class="choice-desc">Pendapatan tambahan</span>
+          </span>
+        </button>
+        <button class="choice choice--income choice--row" type="button" data-category="balance">
+          <span class="choice-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h13v4"/><path d="M3 7v10a2 2 0 0 0 2 2h14a1 1 0 0 0 1-1v-9a1 1 0 0 0-1-1H5a2 2 0 0 1-2-2"/><circle cx="16.5" cy="13.5" r="1" fill="currentColor"/></svg></span>
+          <span class="choice-text">
+            <span class="choice-title">Balance</span>
+            <span class="choice-desc">Baki sedia ada</span>
+          </span>
+        </button>
+      </div>
     </div>
+
   </div>
 </dialog>
 
-<script src="script.js?v=6" defer></script>
+<script src="script.js?v=7" defer></script>
 </body>
 </html>
