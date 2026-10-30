@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=4">
+<link rel="stylesheet" href="style.css?v=5">
 </head>
 <body>
 
@@ -17,17 +17,33 @@
   <div class="header-inner">
     <h1 class="brand">Money <em>Tracker</em></h1>
 
-    <button class="nav-toggle" id="navToggle" type="button"
-            aria-label="Buka menu" aria-expanded="false" aria-controls="nav">
-      <span class="bars" aria-hidden="true"><span></span><span></span><span></span></span>
-    </button>
+    <div class="header-right">
+      <!-- Tablet & desktop: di sebelah kiri navbar -->
+      <button class="btn-add btn-add--desktop" type="button" data-action="add" aria-label="Add transaction">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        <span>Add<span class="add-more"> Transaction</span></span>
+      </button>
 
-    <nav class="nav" id="nav" aria-label="Menu utama">
-      <span class="nav-indicator" aria-hidden="true"></span>
-      <button type="button" data-page="dashboard">Dashboard</button>
-      <button type="button" data-page="income">Income</button>
-      <button type="button" data-page="expense">Expense</button>
-    </nav>
+      <!-- Telefon: butang 3 garis -->
+      <button class="nav-toggle" id="navToggle" type="button"
+              aria-label="Buka menu" aria-expanded="false" aria-controls="nav">
+        <span class="bars" aria-hidden="true"><span></span><span></span><span></span></span>
+      </button>
+
+      <nav class="nav" id="nav" aria-label="Menu utama">
+        <span class="nav-indicator" aria-hidden="true"></span>
+
+        <!-- Telefon: di dalam menu, atas Dashboard -->
+        <button class="btn-add btn-add--menu" type="button" data-action="add">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+          <span>Add Transaction</span>
+        </button>
+
+        <button type="button" data-page="dashboard">Dashboard</button>
+        <button type="button" data-page="income">Income</button>
+        <button type="button" data-page="expense">Expense</button>
+      </nav>
+    </div>
   </div>
 </header>
 
@@ -102,6 +118,6 @@
   </section>
 </main>
 
-<script src="script.js?v=4" defer></script>
+<script src="script.js?v=5" defer></script>
 </body>
 </html>
