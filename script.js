@@ -89,6 +89,133 @@
     wide.addListener(onBreakpoint);
   }
 
+  /* ---------- Senarai rekod Income (dari Google Sheet) ---------- */
+  var incomeList = document.getElementById("incomeList");
+  var incomeRows = [];
+  var incomeLoaded = false;
+  var incomeLoading = false;
+  var incomeReload = false;
+  var MONTHS = ["Jan", "Feb", "Mac", "Apr", "Mei", "Jun", "Jul", "Ogo", "Sep", "Okt", "Nov", "Dis"];
+
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;   // textContent: selamat daripada HTML dalam note
+    return n;
+  }
+
+  function fmtDate(iso) {
+    var p = String(iso).split("-");
+    if (p.length !== 3 || !MONTHS[Number(p[1]) - 1]) return String(iso);
+    return Number(p[2]) + " " + MONTHS[Number(p[1]) - 1] + " " + p[0];
+  }
+
+  function fmtMoney(n) {
+    return "RM " + Number(n).toLocaleString("en-MY", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  }
+
+  function catLabel(type, key) {
+    var c = CATEGORIES[type] && CATEGORIES[type][key];
+    return c ? c.title : String(key);
+  }
+
+  function renderIncomeState(msg, withRetry) {
+    incomeList.textContent = "";
+    var box = el("div", "panel");
+    box.appendChild(el("p", null, msg));
+    if (withRetry) {
+      var btn = el("button", "btn-retry", "Cuba lagi");
+      btn.type = "button";
+      btn.setAttribute("data-retry", "income");
+      box.appendChild(btn);
+    }
+    incomeList.appendChild(box);
+  }
+
+  function renderIncome() {
+    if (!incomeRows.length) {
+      renderIncomeState("Belum ada rekod income. Tekan Add Transaction untuk mula.");
+      return;
+    }
+
+    var rows = incomeRows.slice().sort(function (a, b) {
+      if (a.date !== b.date) return a.date < b.date ? 1 : -1;
+      return String(a.timestamp) < String(b.timestamp) ? 1 : -1;
+    });
+
+    var total = rows.reduce(function (s, r) { return s + Number(r.amount || 0); }, 0);
+
+    incomeList.textContent = "";
+    incomeList.appendChild(el("p", "records-meta",
+      rows.length + " rekod \u00B7 Jumlah " + fmtMoney(total)));
+
+    var head = el("div", "records-head");
+    head.setAttribute("aria-hidden", "true");
+    ["Tarikh", "Kategori", "Note", "Amount"].forEach(function (t) {
+      head.appendChild(el("span", null, t));
+    });
+    incomeList.appendChild(head);
+
+    var list = el("div", "records");
+    rows.forEach(function (r, i) {
+      var item = el("article", "record");
+      item.style.setProperty("--i", Math.min(i, 12));
+
+      item.appendChild(el("span", "record-date", fmtDate(r.date)));
+      item.appendChild(el("span", "record-cat", catLabel("income", r.category)));
+
+      var note = String(r.note == null ? "" : r.note).replace(/^'(?=[=+\-@])/, "");
+      item.appendChild(el("span", note ? "record-note" : "record-note is-empty", note || "\u2014"));
+
+      item.appendChild(el("span", "record-amount", "+ " + fmtMoney(r.amount)));
+      list.appendChild(item);
+    });
+    incomeList.appendChild(list);
+  }
+
+  function loadIncome() {
+    if (!incomeList) return;
+    if (!SHEET_URL) {
+      renderIncomeState("URL Google Sheet belum diset dalam script.js.");
+      return;
+    }
+    if (incomeLoading) { incomeReload = true; return; }
+
+    incomeLoading = true;
+    if (!incomeLoaded) renderIncomeState("Memuatkan rekod...");
+
+    var url = SHEET_URL + (SHEET_URL.indexOf("?") === -1 ? "?" : "&") +
+              "action=list&t=" + Date.now();
+
+    fetch(url).then(function (res) {
+      if (!res.ok) throw new Error("Server " + res.status);
+      return res.json();
+    }).then(function (out) {
+      if (!out || !out.ok) throw new Error((out && out.error) || "Ralat tidak diketahui");
+      incomeRows = out.income || [];
+      incomeLoaded = true;
+      renderIncome();
+    }).catch(function () {
+      if (!incomeLoaded) {
+        renderIncomeState("Gagal memuatkan rekod income.", true);
+      } else {
+        showToast("Gagal kemas kini senarai", true);
+      }
+    }).then(function () {
+      incomeLoading = false;
+      if (incomeReload) { incomeReload = false; loadIncome(); }
+    });
+  }
+
+  if (incomeList) {
+    incomeList.addEventListener("click", function (e) {
+      if (e.target.closest("[data-retry]")) loadIncome();
+    });
+  }
+
   /* ---------- Ingat halaman terakhir (kekal selepas refresh) ---------- */
   var STORE_KEY = "moneyTracker.page";
 
@@ -119,6 +246,7 @@
 
     document.title = TITLES[page] + " \u00B7 Money Tracker";
     savePage(page);
+    if (page === "income") loadIncome();
     moveIndicator();
   }
 
@@ -357,6 +485,7 @@
           closeModal();
           showToast("Transaksi disimpan");
           document.dispatchEvent(new CustomEvent("transaction-save", { detail: detail }));
+          if (detail.type === "income") loadIncome();
         }).catch(function (err) {
           setBusy(false);
           showToast("Gagal simpan: " + (err && err.message ? err.message : "cuba lagi"), true);
