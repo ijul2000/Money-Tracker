@@ -1522,3 +1522,8 @@ body.page-bare main {
   .card--breakdown .amount { font-size: 2.5rem; }
   .bd-item { font-size: 0.92rem; }
 }
+
+/* Pecahan kategori: warna merah untuk expense */
+.card--expense .bd-pct { color: var(--expense); }
+.card--expense .bd-bar { background: var(--expense-bg); }
+.card--expense .bd-bar i { background: var(--expense); }
