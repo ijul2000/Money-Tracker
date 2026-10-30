@@ -119,35 +119,53 @@
   var modal = document.getElementById("addModal");
   var stepType = document.getElementById("stepType");
   var stepIncome = document.getElementById("stepIncome");
+  var stepExpense = document.getElementById("stepExpense");
   var stepForm = document.getElementById("stepForm");
   var txForm = document.getElementById("txForm");
   var formTitle = document.getElementById("txFormTitle");
   var formHint = document.getElementById("txFormHint");
+  var currentType = "income";
   var currentCategory = null;
 
-  // Tajuk, penerangan dan contoh note bagi setiap kategori income
+  // Tajuk, penerangan dan contoh note bagi setiap kategori
   var CATEGORIES = {
-    "salary":       { title: "Salary",       hint: "Isi maklumat gaji.",                placeholder: "Contoh: Gaji bulan Oktober" },
-    "overtime":     { title: "Overtime",     hint: "Isi maklumat kerja lebih masa.",    placeholder: "Contoh: OT hujung minggu" },
-    "extra-income": { title: "Extra Income", hint: "Isi maklumat pendapatan tambahan.", placeholder: "Contoh: Jual barang terpakai" },
-    "balance":      { title: "Balance",      hint: "Isi maklumat baki sedia ada.",      placeholder: "Contoh: Baki bawa dari bulan lepas" }
+    income: {
+      "salary":       { title: "Salary",       hint: "Isi maklumat gaji.",                placeholder: "Contoh: Gaji bulan Oktober" },
+      "overtime":     { title: "Overtime",     hint: "Isi maklumat kerja lebih masa.",    placeholder: "Contoh: OT hujung minggu" },
+      "extra-income": { title: "Extra Income", hint: "Isi maklumat pendapatan tambahan.", placeholder: "Contoh: Jual barang terpakai" },
+      "balance":      { title: "Balance",      hint: "Isi maklumat baki sedia ada.",      placeholder: "Contoh: Baki bawa dari bulan lepas" }
+    },
+    expense: {
+      "food-drink":    { title: "Food & Drink",  hint: "Isi maklumat makan & minum.",       placeholder: "Contoh: Makan tengah hari" },
+      "shopping":      { title: "Shopping",      hint: "Isi maklumat membeli-belah.",       placeholder: "Contoh: Baju raya" },
+      "home":          { title: "Home",          hint: "Isi maklumat perbelanjaan rumah.",  placeholder: "Contoh: Baiki paip sinki" },
+      "bill-fee":      { title: "Bill & Fee",    hint: "Isi maklumat bil & yuran.",         placeholder: "Contoh: Bil elektrik" },
+      "entertainment": { title: "Entertainment", hint: "Isi maklumat hiburan.",             placeholder: "Contoh: Tiket wayang" },
+      "loan":          { title: "Loan",          hint: "Isi maklumat bayaran pinjaman.",    placeholder: "Contoh: Ansuran kereta" },
+      "groceries":     { title: "Groceries",     hint: "Isi maklumat barang dapur.",        placeholder: "Contoh: Barang dapur mingguan" },
+      "transport":     { title: "Transport",     hint: "Isi maklumat pengangkutan.",        placeholder: "Contoh: Minyak kereta" },
+      "medical":       { title: "Medical",       hint: "Isi maklumat perubatan.",           placeholder: "Contoh: Ubat di farmasi" }
+    }
   };
 
-  function setCategory(cat) {
-    var info = CATEGORIES[cat];
+  function setCategory(type, cat) {
+    var info = CATEGORIES[type] && CATEGORIES[type][cat];
     if (!info) return false;
+    currentType = type;
     currentCategory = cat;
     if (formTitle) formTitle.textContent = info.title;
     if (formHint) formHint.textContent = info.hint;
     if (txForm) txForm.elements.note.placeholder = info.placeholder;
+    if (stepForm) stepForm.dataset.kind = type;   // warna borang ikut jenis
     return true;
   }
 
-  // Tukar antara langkah "type", "income" (kategori) dan "form" (borang)
+  // Tukar antara langkah "type", "income"/"expense" (kategori) dan "form" (borang)
   function showStep(name) {
     if (!stepType || !stepIncome) return;
     stepType.hidden = (name !== "type");
     stepIncome.hidden = (name !== "income");
+    if (stepExpense) stepExpense.hidden = (name !== "expense");
     if (stepForm) stepForm.hidden = (name !== "form");
   }
 
@@ -216,22 +234,19 @@
       b.addEventListener("click", closeModal);
     });
 
-    // Langkah 1: Income -> pilih kategori; Expense -> terus pilih
+    // Langkah 1: pilih Income atau Expense -> pilih kategori
     Array.prototype.forEach.call(modal.querySelectorAll("[data-type]"), function (b) {
       b.addEventListener("click", function () {
-        if (b.dataset.type === "income") {
-          showStep("income");
-          focusFirst(stepIncome, ".choice");
-        } else {
-          pick(b.dataset.type, null);
-        }
+        var isIncome = (b.dataset.type === "income");
+        showStep(isIncome ? "income" : "expense");
+        focusFirst(isIncome ? stepIncome : stepExpense, ".choice");
       });
     });
 
-    // Langkah 2: kategori Income
+    // Langkah 2: kategori Income / Expense
     Array.prototype.forEach.call(modal.querySelectorAll("[data-category]"), function (b) {
       b.addEventListener("click", function () {
-        if (setCategory(b.dataset.category)) {
+        if (setCategory(b.dataset.kind || "income", b.dataset.category)) {
           resetForm();
           showStep("form");
           // Desktop: terus fokus pada Amount. Telefon: jangan fokus automatik
@@ -240,20 +255,21 @@
             focusFirst(stepForm, "#txAmount");
           }
         } else {
-          pick("income", b.dataset.category);
+          pick(b.dataset.kind || "income", b.dataset.category);
         }
       });
     });
 
-    // Butang kembali dari borang ke senarai kategori ke senarai kategori
-    Array.prototype.forEach.call(modal.querySelectorAll("[data-back-income]"), function (b) {
+    // Butang kembali dari borang ke senarai kategori
+    Array.prototype.forEach.call(modal.querySelectorAll("[data-back-form]"), function (b) {
       b.addEventListener("click", function () {
-        showStep("income");
-        focusFirst(stepIncome, '[data-category="' + currentCategory + '"]');
+        showStep(currentType);
+        focusFirst(currentType === "expense" ? stepExpense : stepIncome,
+                   '[data-category="' + currentCategory + '"]');
       });
     });
 
-    // Hantar borang (semua kategori income)
+    // Hantar borang (semua kategori income & expense)
     if (txForm) {
       txForm.addEventListener("submit", function (e) {
         e.preventDefault();
@@ -264,7 +280,7 @@
         closeModal();
         document.dispatchEvent(new CustomEvent("transaction-save", {
           detail: {
-            type: "income",
+            type: currentType,
             category: currentCategory,
             date: f.date.value,
             amount: Math.round(amount * 100) / 100,
@@ -278,7 +294,7 @@
     Array.prototype.forEach.call(modal.querySelectorAll("[data-back]"), function (b) {
       b.addEventListener("click", function () {
         showStep("type");
-        focusFirst(stepType, '[data-type="income"]');
+        focusFirst(stepType, b.closest("#stepExpense") ? '[data-type="expense"]' : '[data-type="income"]');
       });
     });
   }
