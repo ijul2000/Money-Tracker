@@ -314,6 +314,10 @@ h2 {
   letter-spacing: -0.01em;
 }
 
+.eyebrow--date {
+  margin: 0.4rem 0 0;
+}
+
 .intro {
   color: var(--muted);
   max-width: 52ch;
