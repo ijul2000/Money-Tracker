@@ -119,12 +119,29 @@
   var modal = document.getElementById("addModal");
   var stepType = document.getElementById("stepType");
   var stepIncome = document.getElementById("stepIncome");
+  var stepSalary = document.getElementById("stepSalary");
+  var salaryForm = document.getElementById("salaryForm");
 
-  // Tukar antara langkah "type" (Income/Expense) dan "income" (kategori)
+  // Tukar antara langkah "type", "income" (kategori) dan "salary" (borang)
   function showStep(name) {
     if (!stepType || !stepIncome) return;
     stepType.hidden = (name !== "type");
     stepIncome.hidden = (name !== "income");
+    if (stepSalary) stepSalary.hidden = (name !== "salary");
+  }
+
+  // Tarikh hari ini (zon masa tempatan) dalam format YYYY-MM-DD
+  function todayISO() {
+    var d = new Date();
+    var m = String(d.getMonth() + 1).padStart(2, "0");
+    var day = String(d.getDate()).padStart(2, "0");
+    return d.getFullYear() + "-" + m + "-" + day;
+  }
+
+  function resetSalaryForm() {
+    if (!salaryForm) return;
+    salaryForm.reset();
+    salaryForm.elements.date.value = todayISO();
   }
 
   function focusFirst(container, selector) {
@@ -134,6 +151,7 @@
 
   function openModal() {
     if (!modal) return;
+    resetSalaryForm();
     showStep("type");
     if (typeof modal.showModal === "function") {
       modal.showModal();
@@ -192,9 +210,43 @@
     // Langkah 2: kategori Income
     Array.prototype.forEach.call(modal.querySelectorAll("[data-category]"), function (b) {
       b.addEventListener("click", function () {
-        pick("income", b.dataset.category);
+        if (b.dataset.category === "salary") {
+          showStep("salary");
+          focusFirst(stepSalary, "input");
+        } else {
+          pick("income", b.dataset.category);
+        }
       });
     });
+
+    // Butang kembali dari borang Salary ke senarai kategori
+    Array.prototype.forEach.call(modal.querySelectorAll("[data-back-income]"), function (b) {
+      b.addEventListener("click", function () {
+        showStep("income");
+        focusFirst(stepIncome, '[data-category="salary"]');
+      });
+    });
+
+    // Hantar borang Salary
+    if (salaryForm) {
+      salaryForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var f = salaryForm.elements;
+        var amount = parseFloat(f.amount.value);
+        if (!f.date.value || !(amount > 0)) return;
+
+        closeModal();
+        document.dispatchEvent(new CustomEvent("transaction-save", {
+          detail: {
+            type: "income",
+            category: "salary",
+            date: f.date.value,
+            amount: Math.round(amount * 100) / 100,
+            note: f.note.value.trim()
+          }
+        }));
+      });
+    }
 
     // Butang kembali
     Array.prototype.forEach.call(modal.querySelectorAll("[data-back]"), function (b) {
