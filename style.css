@@ -726,14 +726,55 @@ html.modal-open { overflow: hidden; }
   .btn-submit { color: #0b1514; }
 }
 
-/* ---------- Senarai rekod ---------- */
-.records-meta {
-  margin-bottom: 0.9rem;
-  font-size: 0.88rem;
-  font-weight: 500;
+/* ---------- Kepala seksyen + kad jumlah (kanan atas) ---------- */
+.section-head--split {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.section-head-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.card--total {
+  flex-shrink: 0;
+  min-width: 9.5rem;
+  padding: 0.8rem 1rem 0.9rem;
+}
+
+.card--total .card-label { gap: 0.5rem; font-size: 0.78rem; }
+
+.card--total .card-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 10px;
+}
+
+.card--total .amount {
+  margin-top: 0.6rem;
+  font-size: clamp(1.5rem, 6vw, 2rem);
+}
+
+.card-count {
+  margin-top: 0.2rem;
+  font-size: 0.78rem;
   color: var(--muted);
 }
 
+@media (min-width: 640px) {
+  .card--total {
+    min-width: 14rem;
+    padding: 1.1rem 1.4rem 1.2rem;
+  }
+  .card--total .card-label { font-size: 0.88rem; }
+  .card--total .card-icon { width: 34px; height: 34px; border-radius: 12px; }
+  .card--total .amount { margin-top: 0.8rem; font-size: 2.3rem; }
+}
+
+/* ---------- Senarai rekod ---------- */
 .records-head { display: none; }
 
 .records {
