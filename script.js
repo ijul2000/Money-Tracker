@@ -5,7 +5,7 @@
   "use strict";
 
   // URL Web App Google Apps Script (Deploy > Web app > salin URL berakhir /exec)
-  var SHEET_URL = "https://script.google.com/macros/s/AKfycbwih6nimzaC79N9YP3CsaaEyagJuYdMmSF2-l41Kr_WYZl7A3xk9rnu4jbWObdf4VZvSw/exec";
+  var SHEET_URL = "";
 
   var PAGES = ["dashboard", "income", "expense"];
   var TITLES = {
@@ -89,6 +89,17 @@
     wide.addListener(onBreakpoint);
   }
 
+  /* ---------- Ingat halaman terakhir (kekal selepas refresh) ---------- */
+  var STORE_KEY = "moneyTracker.page";
+
+  function savePage(page) {
+    try { localStorage.setItem(STORE_KEY, page); } catch (e) { /* storan tidak tersedia */ }
+  }
+
+  function savedPage() {
+    try { return localStorage.getItem(STORE_KEY); } catch (e) { return null; }
+  }
+
   /* ---------- Tukar halaman ---------- */
   function show(page) {
     if (PAGES.indexOf(page) === -1) page = "dashboard";
@@ -107,6 +118,7 @@
     });
 
     document.title = TITLES[page] + " \u00B7 Money Tracker";
+    savePage(page);
     moveIndicator();
   }
 
@@ -397,7 +409,16 @@
   }
 
   /* ---------- Mula ---------- */
-  show(location.hash.slice(1));
+  // Utamakan hash dalam URL; kalau tiada, guna halaman terakhir yang disimpan
+  var startPage = location.hash.slice(1);
+  if (PAGES.indexOf(startPage) === -1) {
+    startPage = savedPage();
+    if (PAGES.indexOf(startPage) === -1) startPage = "dashboard";
+    if (history.replaceState) {
+      history.replaceState(null, "", "#" + startPage);
+    }
+  }
+  show(startPage);
 
   // Kira semula kedudukan penanda apabila saiz skrin atau fon berubah
   window.addEventListener("resize", moveIndicator);
