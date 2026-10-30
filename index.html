@@ -80,6 +80,42 @@
       <p class="cf-net" id="cfNet"></p>
     </article>
 
+    <div class="dn-grid" id="dnGrid" hidden>
+      <article class="card card--income dn-card" style="--i:4">
+        <div class="card-label">
+          <span class="card-icon">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="m6 13 6 6 6-6"/></svg>
+          </span>
+          Jumlah Income
+        </div>
+        <div class="dn-wrap">
+          <div class="dn-chart" id="dnIncomeChart" role="img" aria-label="Donat Jumlah Income"></div>
+          <div class="dn-center">
+            <span class="dn-cur">RM</span>
+            <span class="dn-total" id="dnIncomeTotal">0.00</span>
+          </div>
+        </div>
+        <ul class="dn-legend" id="dnIncomeLegend"></ul>
+      </article>
+
+      <article class="card card--expense dn-card" style="--i:5">
+        <div class="card-label">
+          <span class="card-icon">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m6 11 6-6 6 6"/></svg>
+          </span>
+          Jumlah Expense
+        </div>
+        <div class="dn-wrap">
+          <div class="dn-chart" id="dnExpenseChart" role="img" aria-label="Donat Jumlah Expense"></div>
+          <div class="dn-center">
+            <span class="dn-cur">RM</span>
+            <span class="dn-total" id="dnExpenseTotal">0.00</span>
+          </div>
+        </div>
+        <ul class="dn-legend" id="dnExpenseLegend"></ul>
+      </article>
+    </div>
+
     <div class="panel" id="ovPanel" style="--i:3">
       <p id="ovPanelText">Belum ada rekod lagi. Tambah income atau expense untuk mula.</p>
     </div>
