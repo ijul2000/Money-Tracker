@@ -234,7 +234,11 @@
         if (setCategory(b.dataset.category)) {
           resetForm();
           showStep("form");
-          focusFirst(stepForm, "input");
+          // Desktop: terus fokus pada Amount. Telefon: jangan fokus automatik
+          // supaya date picker / papan kekunci tidak terbuka sendiri.
+          if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+            focusFirst(stepForm, "#txAmount");
+          }
         } else {
           pick("income", b.dataset.category);
         }
