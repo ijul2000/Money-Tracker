@@ -5,7 +5,7 @@
   "use strict";
 
   // URL Web App Google Apps Script (Deploy > Web app > salin URL berakhir /exec)
-  var SHEET_URL = "";
+  var SHEET_URL = "https://script.google.com/macros/s/AKfycbwih6nimzaC79N9YP3CsaaEyagJuYdMmSF2-l41Kr_WYZl7A3xk9rnu4jbWObdf4VZvSw/exec";
 
   var PAGES = ["dashboard", "income", "expense"];
   var TITLES = {
