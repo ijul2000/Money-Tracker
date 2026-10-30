@@ -1036,6 +1036,92 @@ html.modal-open { overflow: hidden; }
 .btn-submit:disabled { opacity: 0.6; cursor: progress; }
 
 /* ---------- Animasi ---------- */
+/* ---------- Kad Cash Flow (chart inflow / outflow) ---------- */
+.cashflow {
+  margin-top: 1rem;
+  position: relative;
+}
+
+.cf-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.cf-legend {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.cf-key {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.cf-key::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  background: currentColor;
+}
+
+.cf-key--in::before  { background: var(--income); }
+.cf-key--out::before { background: var(--expense); }
+
+.cf-chart {
+  margin-top: 1rem;
+  width: 100%;
+  min-height: 220px;
+}
+
+.cf-chart svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.cf-chart .cf-grid   { stroke: var(--line); stroke-width: 1; }
+.cf-chart .cf-axis   { fill: var(--muted); font-size: 11px; font-family: inherit; }
+.cf-chart .cf-bar    { transition: opacity 0.2s var(--ease); }
+.cf-chart .cf-bar--in  { fill: var(--income); }
+.cf-chart .cf-bar--out { fill: var(--expense); }
+.cf-chart .cf-hit    { fill: transparent; cursor: pointer; }
+.cf-chart .cf-col:hover .cf-bar,
+.cf-chart .cf-col.is-active .cf-bar { opacity: 0.8; }
+
+.cf-tip {
+  position: absolute;
+  z-index: 3;
+  min-width: 140px;
+  padding: 0.6rem 0.75rem;
+  background: var(--header);
+  color: var(--header-text);
+  border-radius: 12px;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  box-shadow: var(--shadow);
+  pointer-events: none;
+}
+
+.cf-tip strong { display: block; margin-bottom: 0.15rem; }
+.cf-tip .in  { color: var(--income); }
+.cf-tip .out { color: var(--expense); }
+
+.cf-net {
+  margin: 0.75rem 0 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.cf-net strong { color: var(--ink); font-weight: 600; }
+
 @keyframes rise {
   from { opacity: 0; transform: translateY(14px); }
   to   { opacity: 1; transform: none; }
