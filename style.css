@@ -726,6 +726,32 @@ html.modal-open { overflow: hidden; }
   .btn-submit { color: #0b1514; }
 }
 
+/* Toast */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+  z-index: 100;
+  max-width: calc(100% - 2rem);
+  padding: 0.75rem 1.25rem;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--header-text);
+  background: var(--header);
+  border: 1px solid rgba(217, 201, 160, 0.4);
+  border-radius: 999px;
+  box-shadow: var(--shadow);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 12px);
+  transition: opacity 0.25s, transform 0.3s var(--ease);
+}
+
+.toast.is-show { opacity: 1; transform: translate(-50%, 0); }
+.toast--error { background: var(--expense); color: #fff; border-color: transparent; }
+
+.btn-submit:disabled { opacity: 0.6; cursor: progress; }
+
 /* ---------- Animasi ---------- */
 @keyframes rise {
   from { opacity: 0; transform: translateY(14px); }
