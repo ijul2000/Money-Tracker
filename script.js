@@ -123,11 +123,9 @@
 
   // Kemas kini kad jumlah income (kanan atas)
   var totalValueEl = document.getElementById("incomeTotalValue");
-  var totalCountEl = document.getElementById("incomeTotalCount");
 
-  function setIncomeTotal(total, count) {
+  function setIncomeTotal(total) {
     if (totalValueEl) totalValueEl.textContent = (total == null) ? "\u2014" : fmtNum(total);
-    if (totalCountEl) totalCountEl.textContent = (count == null) ? "\u00A0" : count + " rekod";
   }
 
   function catLabel(type, key) {
@@ -150,7 +148,7 @@
 
   function renderIncome() {
     if (!incomeRows.length) {
-      setIncomeTotal(0, 0);
+      setIncomeTotal(0);
       renderIncomeState("Belum ada rekod income. Tekan Add Transaction untuk mula.");
       return;
     }
@@ -162,7 +160,7 @@
 
     var total = rows.reduce(function (s, r) { return s + Number(r.amount || 0); }, 0);
 
-    setIncomeTotal(total, rows.length);
+    setIncomeTotal(total);
 
     incomeList.textContent = "";
 
