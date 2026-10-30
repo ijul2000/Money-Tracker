@@ -588,6 +588,101 @@ html.modal-open { overflow: hidden; }
   min-width: 0;
 }
 
+/* Borang transaksi (Salary) */
+.tx-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.field { display: grid; gap: 0.4rem; }
+
+.field label {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.field .optional {
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+  font: inherit;
+  font-size: 1rem;
+  color: var(--ink);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 0.75rem 0.9rem;
+  min-height: 48px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.field textarea {
+  resize: vertical;
+  min-height: 88px;
+  line-height: 1.5;
+}
+
+.field input::placeholder,
+.field textarea::placeholder { color: var(--muted); opacity: 0.7; }
+
+.field input:focus,
+.field textarea:focus {
+  outline: none;
+  border-color: var(--income);
+  box-shadow: 0 0 0 3px var(--income-bg);
+}
+
+.input-money { position: relative; }
+
+.input-prefix {
+  position: absolute;
+  left: 0.9rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+.input-money input {
+  padding-left: 2.9rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.btn-submit {
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  min-height: 50px;
+  margin-top: 0.25rem;
+  padding: 0.7rem 1.25rem;
+  color: #fff;
+  border: 0;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: transform 0.2s var(--ease), filter 0.2s;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.btn-submit--income { background: var(--income); }
+.btn-submit:active { transform: scale(0.98); }
+.btn-submit:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+
+@media (hover: hover) {
+  .btn-submit:hover { filter: brightness(1.08); }
+}
+
+@media (prefers-color-scheme: dark) {
+  .btn-submit--income { color: #0b1514; }
+}
+
 /* ---------- Animasi ---------- */
 @keyframes rise {
   from { opacity: 0; transform: translateY(14px); }
