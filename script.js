@@ -110,11 +110,24 @@
     return Number(p[2]) + " " + MONTHS[Number(p[1]) - 1] + " " + p[0];
   }
 
-  function fmtMoney(n) {
-    return "RM " + Number(n).toLocaleString("en-MY", {
+  function fmtNum(n) {
+    return Number(n).toLocaleString("en-MY", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     });
+  }
+
+  function fmtMoney(n) {
+    return "RM " + fmtNum(n);
+  }
+
+  // Kemas kini kad jumlah income (kanan atas)
+  var totalValueEl = document.getElementById("incomeTotalValue");
+  var totalCountEl = document.getElementById("incomeTotalCount");
+
+  function setIncomeTotal(total, count) {
+    if (totalValueEl) totalValueEl.textContent = (total == null) ? "\u2014" : fmtNum(total);
+    if (totalCountEl) totalCountEl.textContent = (count == null) ? "\u00A0" : count + " rekod";
   }
 
   function catLabel(type, key) {
@@ -137,6 +150,7 @@
 
   function renderIncome() {
     if (!incomeRows.length) {
+      setIncomeTotal(0, 0);
       renderIncomeState("Belum ada rekod income. Tekan Add Transaction untuk mula.");
       return;
     }
@@ -148,9 +162,9 @@
 
     var total = rows.reduce(function (s, r) { return s + Number(r.amount || 0); }, 0);
 
+    setIncomeTotal(total, rows.length);
+
     incomeList.textContent = "";
-    incomeList.appendChild(el("p", "records-meta",
-      rows.length + " rekod \u00B7 Jumlah " + fmtMoney(total)));
 
     var head = el("div", "records-head");
     head.setAttribute("aria-hidden", "true");
