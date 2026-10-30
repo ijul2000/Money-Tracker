@@ -12,8 +12,10 @@
   };
 
   var nav = document.getElementById("nav");
+  var toggle = document.getElementById("navToggle");
   var indicator = nav.querySelector(".nav-indicator");
   var buttons = Array.prototype.slice.call(nav.querySelectorAll("button"));
+  var wide = window.matchMedia("(min-width: 640px)");
 
   /* ---------- Penanda navbar yang meluncur ---------- */
   function moveIndicator() {
@@ -25,6 +27,43 @@
     indicator.style.transform =
       "translate(" + active.offsetLeft + "px," + active.offsetTop + "px)";
     nav.classList.add("has-indicator");
+  }
+
+  /* ---------- Menu 3 garis (telefon) ---------- */
+  function setMenu(open) {
+    nav.classList.toggle("is-open", open);
+    toggle.setAttribute("aria-expanded", open ? "true" : "false");
+    toggle.setAttribute("aria-label", open ? "Tutup menu" : "Buka menu");
+  }
+
+  toggle.addEventListener("click", function () {
+    setMenu(!nav.classList.contains("is-open"));
+  });
+
+  // Tutup bila tekan di luar header
+  document.addEventListener("click", function (e) {
+    if (nav.classList.contains("is-open") && !e.target.closest(".site-header")) {
+      setMenu(false);
+    }
+  });
+
+  // Tutup dengan butang Escape
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && nav.classList.contains("is-open")) {
+      setMenu(false);
+      toggle.focus();
+    }
+  });
+
+  // Bila saiz skrin bertukar antara telefon dan tablet/desktop
+  function onBreakpoint() {
+    setMenu(false);
+    moveIndicator();
+  }
+  if (wide.addEventListener) {
+    wide.addEventListener("change", onBreakpoint);
+  } else if (wide.addListener) {
+    wide.addListener(onBreakpoint);
   }
 
   /* ---------- Tukar halaman ---------- */
@@ -49,6 +88,7 @@
 
   buttons.forEach(function (b) {
     b.addEventListener("click", function () {
+      setMenu(false);
       if (location.hash.slice(1) === b.dataset.page) return;
       location.hash = b.dataset.page;
     });
