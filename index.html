@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=13">
+<link rel="stylesheet" href="style.css?v=15">
 </head>
 <body>
 
@@ -100,8 +100,8 @@
       <h2>Income</h2>
       <p class="intro">Rekod pendapatan harian anda.</p>
     </div>
-    <div class="panel" style="--i:0">
-      <p>Rekod pendapatan akan dipaparkan di sini.</p>
+    <div id="incomeList" aria-live="polite">
+      <div class="panel"><p>Memuatkan rekod...</p></div>
     </div>
   </section>
 
@@ -306,6 +306,6 @@
   </div>
 </dialog>
 
-<script src="script.js?v=14" defer></script>
+<script src="script.js?v=15" defer></script>
 </body>
 </html>
