@@ -645,8 +645,6 @@
   if (todayEl) {
     try {
       todayEl.textContent = new Date().toLocaleDateString("ms-MY", {
-        weekday: "long",
-        day: "numeric",
         month: "long",
         year: "numeric"
       });
