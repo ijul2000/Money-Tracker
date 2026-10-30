@@ -627,6 +627,9 @@ html.modal-open { overflow: hidden; }
 
   .brand { font-size: clamp(1.75rem, 4.5vw, 2.5rem); }
 
+  /* Jajarkan tepi header dengan tepi kandungan di bawahnya */
+  .header-inner { max-width: calc(var(--content-max) - 2 * var(--gutter)); }
+
   /* Butang 3 garis tidak diperlukan */
   .nav-toggle { display: none; }
 
