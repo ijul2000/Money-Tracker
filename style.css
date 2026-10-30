@@ -1428,3 +1428,97 @@ body.page-bare main {
 @media (min-width: 900px) {
   .btn-add--desktop { width: 52px; height: 52px; }
 }
+
+/* ---------- Kad Jumlah Income: pecahan kategori (amount & %) ---------- */
+/* Telefon: tajuk, penapis, kemudian kad selebar skrin */
+.section-head--breakdown {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    "text"
+    "filters"
+    "card";
+}
+
+.card--breakdown {
+  width: 100%;
+  min-width: 0;
+  padding: 1.1rem 1.15rem 1.2rem;
+}
+
+.card--breakdown .amount {
+  margin-top: 0.7rem;
+  font-size: clamp(2rem, 9vw, 2.4rem);
+}
+
+.breakdown {
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0.9rem 0 0;
+  border-top: 1px solid var(--line);
+  display: grid;
+  gap: 0.8rem;
+}
+
+.breakdown:empty { display: none; }
+
+.bd-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: baseline;
+  column-gap: 0.75rem;
+  row-gap: 0.35rem;
+  font-size: 0.86rem;
+  line-height: 1.25;
+}
+
+.bd-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.bd-amt {
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.bd-pct {
+  min-width: 2.6rem;
+  text-align: right;
+  font-weight: 600;
+  color: var(--income);
+  font-variant-numeric: tabular-nums;
+}
+
+.bd-bar {
+  grid-column: 1 / -1;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--income-bg);
+  overflow: hidden;
+}
+
+.bd-bar i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--income);
+}
+
+@media (min-width: 640px) {
+  /* Tablet & desktop: tajuk + penapis di kiri, kad (lebih lebar) di kanan */
+  .section-head--breakdown {
+    grid-template-columns: minmax(0, 1fr) minmax(20rem, 26rem);
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      "text    card"
+      "filters card";
+  }
+
+  .card--breakdown { padding: 1.3rem 1.5rem 1.4rem; }
+  .card--breakdown .amount { font-size: 2.5rem; }
+  .bd-item { font-size: 0.92rem; }
+}
