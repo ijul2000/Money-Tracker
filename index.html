@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=15">
+<link rel="stylesheet" href="style.css?v=16">
 </head>
 <body>
 
@@ -95,10 +95,24 @@
 
   <!-- INCOME -->
   <section id="income" hidden>
-    <div class="section-head">
-      <p class="eyebrow">Pendapatan</p>
-      <h2>Income</h2>
-      <p class="intro">Rekod pendapatan harian anda.</p>
+    <div class="section-head section-head--split">
+      <div class="section-head-text">
+        <p class="eyebrow">Pendapatan</p>
+        <h2>Income</h2>
+        <p class="intro">Rekod pendapatan harian anda.</p>
+      </div>
+
+      <!-- Kad jumlah income (kanan atas) -->
+      <article class="card card--income card--total" id="incomeTotal">
+        <div class="card-label">
+          <span class="card-icon">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="m6 13 6 6 6-6"/></svg>
+          </span>
+          Jumlah Income
+        </div>
+        <p class="amount"><span class="cur">RM</span> <span id="incomeTotalValue">&mdash;</span></p>
+        <p class="card-count" id="incomeTotalCount">&nbsp;</p>
+      </article>
     </div>
     <div id="incomeList" aria-live="polite">
       <div class="panel"><p>Memuatkan rekod...</p></div>
@@ -306,6 +320,6 @@
   </div>
 </dialog>
 
-<script src="script.js?v=15" defer></script>
+<script src="script.js?v=16" defer></script>
 </body>
 </html>
