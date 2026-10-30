@@ -350,6 +350,7 @@
     var loaded = false;
     var loading = false;
     var reload = false;
+    var failCount = 0;
 
     // Lalai: bulan & tahun semasa
     var filterMonth = String(nowDate.getMonth() + 1).padStart(2, "0");
@@ -699,8 +700,18 @@
         data.income = out.income || [];
         data.expense = out.expense || [];
         loaded = true;
-        render();
+        failCount = 0;
+        // Ralat lukisan tidak boleh disalah anggap sebagai ralat rangkaian
+        try { render(); } catch (err) {
+          if (window.console) console.error("Overview render:", err);
+        }
       }).catch(function () {
+        failCount++;
+        // Rangkaian telefon sering tersangkut sekejap ketika refresh: cuba sekali lagi dulu
+        if (failCount < 2) {
+          setTimeout(load, 1500);
+          return;
+        }
         if (!loaded) {
           if (cfCard) cfCard.hidden = true;
           if (dnGrid) dnGrid.hidden = true;
