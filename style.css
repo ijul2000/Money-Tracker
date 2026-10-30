@@ -86,7 +86,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
 }
 
 .brand {
@@ -96,6 +97,7 @@ body {
   line-height: 1;
   letter-spacing: -0.02em;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .brand em {
@@ -200,8 +202,82 @@ body {
 }
 
 @media (hover: hover) {
-  .nav button:not([aria-current="page"]):hover { color: var(--header-text); }
+  .nav button[data-page]:not([aria-current="page"]):hover { color: var(--header-text); }
 }
+
+/* ---------- Kumpulan kanan header & butang Add Transaction ---------- */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-left: auto;
+}
+
+.btn-add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--accent);
+  background: transparent;
+  border: 1px solid rgba(217, 201, 160, 0.55);
+  border-radius: 999px;
+  min-height: 44px;
+  padding: 0.5rem 1.1rem;
+  cursor: pointer;
+  transition: background 0.25s, color 0.25s, border-color 0.25s;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.btn-add svg { flex-shrink: 0; }
+
+.btn-add:active {
+  background: var(--accent);
+  color: #1a2523;
+  border-color: var(--accent);
+}
+
+.btn-add:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+@media (hover: hover) {
+  .btn-add:hover {
+    background: var(--accent);
+    color: #1a2523;
+    border-color: var(--accent);
+  }
+}
+
+/* Telefon: butang di dalam menu, atas Dashboard */
+.btn-add--desktop { display: none; }
+
+.nav .btn-add--menu {
+  width: 100%;
+  min-height: 48px;
+  margin-bottom: 0.5rem;
+  border-radius: 14px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  color: var(--accent);
+  border: 1px solid rgba(217, 201, 160, 0.55);
+}
+
+@media (hover: hover) {
+  .nav .btn-add--menu:hover {
+    color: #1a2523;
+    border-color: var(--accent);
+  }
+}
+
+.add-more { display: none; }
 
 /* ---------- Kandungan ---------- */
 main {
@@ -418,7 +494,21 @@ h2 {
     background: transparent;
   }
 
+  /* Add Transaction di sebelah kiri navbar */
+  .btn-add--desktop {
+    display: inline-flex;
+    min-height: 50px;
+    padding: 0.45rem 1.1rem;
+  }
+
+  .nav .btn-add--menu { display: none; }
+
   main { padding-top: 2.5rem; }
+}
+
+/* Label penuh "Add Transaction" apabila ruang mencukupi */
+@media (min-width: 900px) {
+  .add-more { display: inline; }
 }
 
 /* Kad tiga lajur apabila ruang mencukupi */
@@ -444,6 +534,12 @@ h2 {
     font-size: 0.95rem;
     min-height: 42px;
     padding: 0.5rem 1.5rem;
+  }
+
+  .btn-add--desktop {
+    min-height: 52px;
+    padding: 0.5rem 1.4rem;
+    font-size: 0.95rem;
   }
 
   main { padding-top: 3.5rem; padding-bottom: 5rem; }
