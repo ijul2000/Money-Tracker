@@ -115,12 +115,60 @@
     });
   });
 
-  // Butang Add Transaction: tutup menu telefon, kemudian beritahu halaman
-  // (borang tambah transaksi boleh disambungkan pada event "add-transaction")
+  /* ---------- Modal Add Transaction ---------- */
+  var modal = document.getElementById("addModal");
+
+  function openModal() {
+    if (!modal) return;
+    if (typeof modal.showModal === "function") {
+      modal.showModal();
+    } else {
+      modal.setAttribute("open", "");
+    }
+    document.documentElement.classList.add("modal-open");
+  }
+
+  function closeModal() {
+    if (!modal) return;
+    if (typeof modal.close === "function") {
+      modal.close();
+    } else {
+      modal.removeAttribute("open");
+      document.documentElement.classList.remove("modal-open");
+    }
+  }
+
+  if (modal) {
+    // Buang kunci skrol bila modal ditutup (termasuk dengan Escape)
+    modal.addEventListener("close", function () {
+      document.documentElement.classList.remove("modal-open");
+    });
+
+    // Tekan di luar kotak modal (pada latar gelap) untuk tutup
+    modal.addEventListener("click", function (e) {
+      if (e.target === modal) closeModal();
+    });
+
+    Array.prototype.forEach.call(modal.querySelectorAll("[data-close]"), function (b) {
+      b.addEventListener("click", closeModal);
+    });
+
+    // Pilihan Income / Expense
+    Array.prototype.forEach.call(modal.querySelectorAll("[data-type]"), function (b) {
+      b.addEventListener("click", function () {
+        var type = b.dataset.type;
+        closeModal();
+        // Borang transaksi boleh disambungkan pada event ini
+        document.dispatchEvent(new CustomEvent("transaction-type", { detail: { type: type } }));
+      });
+    });
+  }
+
+  // Butang Add Transaction: tutup menu telefon, kemudian buka modal
   addButtons.forEach(function (b) {
     b.addEventListener("click", function () {
       setMenu(false);
-      document.dispatchEvent(new CustomEvent("add-transaction"));
+      openModal();
     });
   });
 
